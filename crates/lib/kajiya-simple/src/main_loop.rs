@@ -186,7 +186,7 @@ impl SimpleMainLoop {
         mut window_builder: WindowBuilder,
     ) -> anyhow::Result<Self> {
         kajiya::logging::set_up_logging(builder.default_log_level)?;
-        std::env::set_var("SMOL_THREADS", "64"); // HACK; TODO: get a real executor
+        unsafe { std::env::set_var("SMOL_THREADS", "64") }; // HACK; TODO: get a real executor
 
         // Note: asking for the logical size means that if the OS is using DPI scaling,
         // we'll get a physically larger window (with more pixels).
