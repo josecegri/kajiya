@@ -33,7 +33,7 @@ pub enum AnyRenderResource {
 
 impl AnyRenderResource {
     #[track_caller]
-    pub fn borrow(&self) -> AnyRenderResourceRef {
+    pub fn borrow(&self) -> AnyRenderResourceRef<'_> {
         match self {
             AnyRenderResource::OwnedImage(inner) => AnyRenderResourceRef::Image(inner),
             AnyRenderResource::ImportedImage(inner) => AnyRenderResourceRef::Image(inner.as_ref()),

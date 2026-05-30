@@ -405,6 +405,8 @@ impl RuntimeState {
                         .range(1..=MAX_FPS_LIMIT)
                         .build(ui, &mut self.max_fps);
 
+                    // TODO: consider removing unsafety
+                    #[allow(static_mut_refs)]
                     ui.checkbox(im_str!("Allow pass overlap"), unsafe {
                         &mut kajiya::rg::RG_ALLOW_PASS_OVERLAP
                     });

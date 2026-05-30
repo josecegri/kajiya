@@ -51,7 +51,7 @@ impl GbufferDepth {
         }
     }
 
-    pub fn half_view_normal(&self, rg: &mut rg::RenderGraph) -> Ref<rg::Handle<Image>> {
+    pub fn half_view_normal(&self, rg: &mut rg::RenderGraph) -> Ref<'_, rg::Handle<Image>> {
         if self.half_view_normal.borrow().is_none() {
             *self.half_view_normal.borrow_mut() = Some(
                 half_res::extract_half_res_gbuffer_view_normal_rgba8(rg, &self.gbuffer),
@@ -61,7 +61,7 @@ impl GbufferDepth {
         Ref::map(self.half_view_normal.borrow(), |res| res.as_ref().unwrap())
     }
 
-    pub fn half_depth(&self, rg: &mut rg::RenderGraph) -> Ref<rg::Handle<Image>> {
+    pub fn half_depth(&self, rg: &mut rg::RenderGraph) -> Ref<'_, rg::Handle<Image>> {
         if self.half_depth.borrow().is_none() {
             *self.half_depth.borrow_mut() = Some(half_res::extract_half_res_depth(rg, &self.depth));
         }

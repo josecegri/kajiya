@@ -2,7 +2,7 @@
 
 use glam::Vec2;
 use std::collections::HashMap;
-pub use winit::event::{ElementState, KeyboardInput, VirtualKeyCode};
+pub use winit::event::{ElementState, VirtualKeyCode};
 use winit::{
     dpi::PhysicalPosition,
     event::{Event, WindowEvent},
