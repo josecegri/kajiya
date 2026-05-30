@@ -1,8 +1,8 @@
-use anyhow::{anyhow, Context};
+use anyhow::{Context, anyhow};
 use kajiya_simple::{KeyMap, KeyboardMap, VirtualKeyCode, VirtualKeyCode::*};
 use serde::{Deserialize, Serialize};
 use std::{
-    fs::{canonicalize, File},
+    fs::{File, canonicalize},
     io::Read,
     path::PathBuf,
 };
@@ -19,7 +19,8 @@ pub struct KeymapConfig {
 
 impl KeymapConfig {
     pub(crate) fn load(path: &Option<PathBuf>) -> anyhow::Result<Self> {
-        let path = path.clone().unwrap_or("keymap.toml".into());
+        let base = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        let path = path.clone().unwrap_or(base.join("keymap.toml"));
         let path = canonicalize(path).with_context(|| {
             "Failed to find keymap.toml. Make sure it is in the same directory as the executable."
         })?;
