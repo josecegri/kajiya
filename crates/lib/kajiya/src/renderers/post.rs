@@ -6,6 +6,8 @@ use rg::{Buffer, BufferDesc, RenderGraph, SimpleRenderPass};
 
 use crate::world_renderer::HistogramClipping;
 
+const USE_RUST_SHADERS: bool = false;
+
 pub fn blur_pyramid(rg: &mut RenderGraph, input: &rg::Handle<Image>) -> rg::Handle<Image> {
     let skip_n_bottom_mips = 1;
     let mut pyramid_desc = input
@@ -21,15 +23,27 @@ pub fn blur_pyramid(rg: &mut RenderGraph, input: &rg::Handle<Image>) -> rg::Hand
 
     let mut output = rg.create(pyramid_desc);
 
-    SimpleRenderPass::new_compute_rust(rg.add_pass("_blur0"), "blur::blur_cs")
-        .read(input)
-        .write_view(
-            &mut output,
-            ImageViewDesc::builder()
-                .base_mip_level(0)
-                .level_count(Some(1)),
-        )
-        .dispatch(output.desc().extent);
+    if USE_RUST_SHADERS {
+        SimpleRenderPass::new_compute_rust(rg.add_pass("_blur0"), "blur::blur_cs")
+            .read(input)
+            .write_view(
+                &mut output,
+                ImageViewDesc::builder()
+                    .base_mip_level(0)
+                    .level_count(Some(1)),
+            )
+            .dispatch(output.desc().extent);
+    } else {
+        SimpleRenderPass::new_compute(rg.add_pass("_blur0"), "/shaders/blur.hlsl")
+            .read(input)
+            .write_view(
+                &mut output,
+                ImageViewDesc::builder()
+                    .base_mip_level(0)
+                    .level_count(Some(1)),
+            )
+            .dispatch(output.desc().extent);
+    }
 
     for target_mip in 1..(output.desc().mip_levels as u32) {
         let downsample_amount = 1 << target_mip;
@@ -77,30 +91,57 @@ pub fn rev_blur_pyramid(rg: &mut RenderGraph, in_pyramid: &rg::Handle<Image>) ->
             0.5f32
         };
 
-        SimpleRenderPass::new_compute_rust(
-            rg.add_pass(&format!("_rev_blur{}", target_mip)),
-            "rev_blur::rev_blur_cs",
-        )
-        .read_view(
-            in_pyramid,
-            ImageViewDesc::builder()
-                .base_mip_level(target_mip)
-                .level_count(Some(1)),
-        )
-        .read_view(
-            &output,
-            ImageViewDesc::builder()
-                .base_mip_level(src_mip)
-                .level_count(Some(1)),
-        )
-        .write_view(
-            &mut output,
-            ImageViewDesc::builder()
-                .base_mip_level(target_mip)
-                .level_count(Some(1)),
-        )
-        .constants((output_extent[0], output_extent[1], self_weight))
-        .dispatch(output_extent);
+        if USE_RUST_SHADERS {
+            SimpleRenderPass::new_compute_rust(
+                rg.add_pass(&format!("_rev_blur{}", target_mip)),
+                "rev_blur::rev_blur_cs",
+            )
+            .read_view(
+                in_pyramid,
+                ImageViewDesc::builder()
+                    .base_mip_level(target_mip)
+                    .level_count(Some(1)),
+            )
+            .read_view(
+                &output,
+                ImageViewDesc::builder()
+                    .base_mip_level(src_mip)
+                    .level_count(Some(1)),
+            )
+            .write_view(
+                &mut output,
+                ImageViewDesc::builder()
+                    .base_mip_level(target_mip)
+                    .level_count(Some(1)),
+            )
+            .constants((output_extent[0], output_extent[1], self_weight))
+            .dispatch(output_extent);
+        } else {
+            SimpleRenderPass::new_compute(
+                rg.add_pass(&format!("_rev_blur{}", target_mip)),
+                "/shaders/rev_blur.hlsl",
+            )
+            .read_view(
+                in_pyramid,
+                ImageViewDesc::builder()
+                    .base_mip_level(target_mip)
+                    .level_count(Some(1)),
+            )
+            .read_view(
+                &output,
+                ImageViewDesc::builder()
+                    .base_mip_level(src_mip)
+                    .level_count(Some(1)),
+            )
+            .write_view(
+                &mut output,
+                ImageViewDesc::builder()
+                    .base_mip_level(target_mip)
+                    .level_count(Some(1)),
+            )
+            .constants((output_extent[0], output_extent[1], self_weight))
+            .dispatch(output_extent);
+        }
     }
 
     output

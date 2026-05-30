@@ -3,6 +3,8 @@ use kajiya_rg::{self as rg, GetOrCreateTemporal, SimpleRenderPass};
 
 use super::GbufferDepth;
 
+const USE_RUST_SHADERS: bool = false;
+
 pub fn calculate_reprojection_map(
     rg: &mut rg::TemporalRenderGraph,
     gbuffer_depth: &GbufferDepth,
@@ -40,13 +42,20 @@ pub fn calculate_reprojection_map(
     .constants(output_tex.desc().extent_inv_extent_2d())
     .dispatch(output_tex.desc().extent);
 
-    SimpleRenderPass::new_compute_rust(
-        rg.add_pass("copy depth"),
-        "copy_depth_to_r::copy_depth_to_r_cs",
-    )
-    .read_aspect(&gbuffer_depth.depth, vk::ImageAspectFlags::DEPTH)
-    .write(&mut prev_depth)
-    .dispatch(prev_depth.desc().extent);
+    if USE_RUST_SHADERS {
+        SimpleRenderPass::new_compute_rust(
+            rg.add_pass("copy depth"),
+            "copy_depth_to_r::copy_depth_to_r_cs",
+        )
+        .read_aspect(&gbuffer_depth.depth, vk::ImageAspectFlags::DEPTH)
+        .write(&mut prev_depth)
+        .dispatch(prev_depth.desc().extent);
+    } else {
+        SimpleRenderPass::new_compute(rg.add_pass("copy depth"), "/shaders/copy_depth_to_r.hlsl")
+            .read_aspect(&gbuffer_depth.depth, vk::ImageAspectFlags::DEPTH)
+            .write(&mut prev_depth)
+            .dispatch(prev_depth.desc().extent);
+    }
 
     output_tex
 }
