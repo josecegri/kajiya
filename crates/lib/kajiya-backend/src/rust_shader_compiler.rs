@@ -2,7 +2,7 @@ use crate::{file::LoadFile, normalized_path_from_vfs, shader_compiler::CompiledS
 use anyhow::{Context, Result};
 use nanoserde::DeJson;
 use parking_lot::Mutex;
-use std::process::Command;
+use std::{process::Command, sync::LazyLock};
 use turbosloth::*;
 
 #[derive(Clone, Hash)]
@@ -93,9 +93,9 @@ impl LazyWorker for CompileRustShaderCrate {
 
         // In case `CompileRustShaderCrate` gets cancelled by `turbosloth`, we will want to cancel
         // the builder thread as well. We'll send a message through a channel to do this.
-        lazy_static::lazy_static! {
-            static ref BUILD_TASK_CANCEL: Mutex<Option<std::sync::mpsc::Sender<()>>> = Mutex::new(None);
-        }
+        static BUILD_TASK_CANCEL: LazyLock<Mutex<Option<std::sync::mpsc::Sender<()>>>> =
+            LazyLock::new(|| Mutex::new(None));
+
         let mut prev_build_task_cancel = BUILD_TASK_CANCEL.lock();
         let (cancel_tx, cancel_rx) = std::sync::mpsc::channel();
 
@@ -109,7 +109,10 @@ impl LazyWorker for CompileRustShaderCrate {
             log::info!("Building Rust-GPU shaders in the background...");
 
             if let Err(err) = compile_rust_shader_crate_thread(cancel_rx) {
-                log::error!("Failed to build Rust-GPU shaders. Falling back to the previously compiled ones. Error: {:?}", err);
+                log::error!(
+                    "Failed to build Rust-GPU shaders. Falling back to the previously compiled ones. Error: {:?}",
+                    err
+                );
             }
 
             Ok(())

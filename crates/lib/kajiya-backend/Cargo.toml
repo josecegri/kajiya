@@ -20,7 +20,6 @@ gpu-allocator = { git = "https://github.com/Traverse-Research/gpu-allocator.git"
 gpu-profiler = { git = "https://github.com/h3r2tic/gpu-profiler.git", rev = "fac8dd96ceacfb69ec278c9697c3bfd2d8b8a9b7", features = ["use-ash"] }
 hassle-rs = "0.10"
 hotwatch = "0.4"
-lazy_static = "1.4"
 log = "0.4"
 nanoserde = "0.2.1"
 normpath = "0.3"

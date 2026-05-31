@@ -1,38 +1,51 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::LazyLock};
 
 use kajiya_backend::{ash::vk, rspirv_reflect, vulkan::device};
 
-lazy_static::lazy_static! {
-    pub static ref BINDLESS_DESCRIPTOR_SET_LAYOUT: HashMap<u32, rspirv_reflect::DescriptorInfo> = [
-        // `meshes`
-        (0, rspirv_reflect::DescriptorInfo {
-            ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER,
-            dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
-            name: Default::default(),
-        }),
-        // `vertices`
-        (1, rspirv_reflect::DescriptorInfo {
-            ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER,
-            dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
-            name: Default::default(),
-        }),
-        // `bindless_texture_sizes`
-        (2, rspirv_reflect::DescriptorInfo {
-            ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER,
-            dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
-            name: Default::default(),
-        }),
-        // `bindless_textures`
-        (BINDLESS_TEXURES_BINDING_INDEX as u32, rspirv_reflect::DescriptorInfo {
-            ty: rspirv_reflect::DescriptorType::SAMPLED_IMAGE,
-            dimensionality: rspirv_reflect::DescriptorDimensionality::RuntimeArray,
-            name: Default::default(),
-        }),
-    ]
-    .iter()
-    .cloned()
-    .collect();
-}
+pub static BINDLESS_DESCRIPTOR_SET_LAYOUT: LazyLock<HashMap<u32, rspirv_reflect::DescriptorInfo>> =
+    LazyLock::new(|| {
+        [
+            // `meshes`
+            (
+                0,
+                rspirv_reflect::DescriptorInfo {
+                    ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER,
+                    dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
+                    name: Default::default(),
+                },
+            ),
+            // `vertices`
+            (
+                1,
+                rspirv_reflect::DescriptorInfo {
+                    ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER,
+                    dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
+                    name: Default::default(),
+                },
+            ),
+            // `bindless_texture_sizes`
+            (
+                2,
+                rspirv_reflect::DescriptorInfo {
+                    ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER,
+                    dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
+                    name: Default::default(),
+                },
+            ),
+            // `bindless_textures`
+            (
+                BINDLESS_TEXURES_BINDING_INDEX as u32,
+                rspirv_reflect::DescriptorInfo {
+                    ty: rspirv_reflect::DescriptorType::SAMPLED_IMAGE,
+                    dimensionality: rspirv_reflect::DescriptorDimensionality::RuntimeArray,
+                    name: Default::default(),
+                },
+            ),
+        ]
+        .iter()
+        .cloned()
+        .collect()
+    });
 
 pub const BINDLESS_TEXURES_BINDING_INDEX: usize = 3;
 

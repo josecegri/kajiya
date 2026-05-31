@@ -1,33 +1,31 @@
 use anyhow::Context as _;
 use bytes::Bytes;
 use hotwatch::Hotwatch;
-use lazy_static::lazy_static;
 use normpath::PathExt;
 use parking_lot::Mutex;
-use std::{collections::HashMap, fs::File, path::PathBuf};
+use std::{collections::HashMap, fs::File, path::PathBuf, sync::LazyLock};
 use turbosloth::*;
 
-lazy_static! {
-    pub(crate) static ref FILE_WATCHER: Mutex<Hotwatch> =
-        Mutex::new(Hotwatch::new_with_custom_delay(std::time::Duration::from_millis(100)).unwrap());
-}
+pub static FILE_WATCHER: LazyLock<Mutex<Hotwatch>> = LazyLock::new(|| {
+    Mutex::new(Hotwatch::new_with_custom_delay(std::time::Duration::from_millis(100)).unwrap())
+});
 
-lazy_static! {
-    static ref VFS_MOUNT_POINTS: Mutex<HashMap<String, PathBuf>> = Mutex::new(
+static VFS_MOUNT_POINTS: LazyLock<Mutex<HashMap<String, PathBuf>>> = LazyLock::new(|| {
+    Mutex::new(
         vec![
             ("/kajiya".to_owned(), PathBuf::from(".")),
             ("/shaders".to_owned(), PathBuf::from("assets/shaders")),
             (
                 "/rust-shaders-compiled".to_owned(),
-                PathBuf::from("assets/rust-shaders-compiled")
+                PathBuf::from("assets/rust-shaders-compiled"),
             ),
             ("/images".to_owned(), PathBuf::from("assets/images")),
-            ("/cache".to_owned(), PathBuf::from("cache"))
+            ("/cache".to_owned(), PathBuf::from("cache")),
         ]
         .into_iter()
-        .collect()
-    );
-}
+        .collect(),
+    )
+});
 
 pub fn set_vfs_mount_point(mount_point: impl Into<String>, path: impl Into<PathBuf>) {
     VFS_MOUNT_POINTS

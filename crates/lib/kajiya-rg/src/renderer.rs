@@ -4,18 +4,21 @@ use crate::{
     TemporalRenderGraphState, TemporalResourceState,
 };
 use kajiya_backend::{
+    Device,
     ash::vk,
     dynamic_constants::*,
     pipeline_cache::*,
     rspirv_reflect,
     transient_resource_cache::TransientResourceCache,
     vk_sync,
-    vulkan::{self, swapchain::Swapchain, RenderBackend},
-    Device,
+    vulkan::{self, RenderBackend, swapchain::Swapchain},
 };
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
-use std::{collections::HashMap, sync::Arc};
+use std::{
+    collections::HashMap,
+    sync::{Arc, LazyLock},
+};
 use turbosloth::*;
 use vulkan::buffer::{Buffer, BufferDesc};
 
@@ -42,40 +45,41 @@ pub struct Renderer {
     temporal_rg_state: TemporalRg,
 }
 
-lazy_static::lazy_static! {
-    static ref FRAME_CONSTANTS_LAYOUT: HashMap<u32, rspirv_reflect::DescriptorInfo> = [
-    // frame_constants
-    (
-        0,
-        rspirv_reflect::DescriptorInfo {
-            ty: rspirv_reflect::DescriptorType::UNIFORM_BUFFER,
-            dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
-            name: Default::default(),
-        },
-    ),
-    // instance_dynamic_parameters_dyn
-    (
-        1,
-        rspirv_reflect::DescriptorInfo {
-            ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER_DYNAMIC,
-            dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
-            name: Default::default(),
-        },
-    ),
-    // triangle_lights_dyn
-    (
-        2,
-        rspirv_reflect::DescriptorInfo {
-            ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER_DYNAMIC,
-            dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
-            name: Default::default(),
-        },
-    ),
-    ]
-    .iter()
-    .cloned()
-    .collect();
-}
+static FRAME_CONSTANTS_LAYOUT: LazyLock<HashMap<u32, rspirv_reflect::DescriptorInfo>> =
+    LazyLock::new(|| {
+        [
+            // frame_constants
+            (
+                0,
+                rspirv_reflect::DescriptorInfo {
+                    ty: rspirv_reflect::DescriptorType::UNIFORM_BUFFER,
+                    dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
+                    name: Default::default(),
+                },
+            ),
+            // instance_dynamic_parameters_dyn
+            (
+                1,
+                rspirv_reflect::DescriptorInfo {
+                    ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER_DYNAMIC,
+                    dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
+                    name: Default::default(),
+                },
+            ),
+            // triangle_lights_dyn
+            (
+                2,
+                rspirv_reflect::DescriptorInfo {
+                    ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER_DYNAMIC,
+                    dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
+                    name: Default::default(),
+                },
+            ),
+        ]
+        .iter()
+        .cloned()
+        .collect()
+    });
 
 pub struct FrameConstantsLayout {
     pub globals_offset: u32,
@@ -293,7 +297,9 @@ impl Renderer {
 
         self.temporal_rg_state = match std::mem::take(&mut self.temporal_rg_state) {
             TemporalRg::Inert(_) => {
-                panic!("Trying to retire the render graph, but it's inert. Was prepare_frame not caled?");
+                panic!(
+                    "Trying to retire the render graph, but it's inert. Was prepare_frame not caled?"
+                );
             }
             TemporalRg::Exported(rg) => TemporalRg::Inert(rg.retire_temporal(&retired_rg)),
         };

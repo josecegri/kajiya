@@ -1,11 +1,10 @@
-use std::{collections::HashMap, fs::File, path::PathBuf};
+use std::{collections::HashMap, fs::File, path::PathBuf, sync::LazyLock};
 
 use anyhow::Context;
 use parking_lot::Mutex;
 
-lazy_static::lazy_static! {
-    static ref ASSET_MMAPS: Mutex<HashMap<PathBuf, memmap2::Mmap>> = Mutex::new(HashMap::new());
-}
+static ASSET_MMAPS: LazyLock<Mutex<HashMap<PathBuf, memmap2::Mmap>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
 
 pub fn mmapped_asset<T, P: Into<std::path::PathBuf>>(path: P) -> anyhow::Result<&'static T> {
     let path = path.into();

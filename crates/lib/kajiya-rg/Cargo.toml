@@ -10,7 +10,6 @@ kajiya-backend = { path = "../kajiya-backend" }
 
 anyhow = "1.0"
 arrayvec = "0.5"
-lazy_static = "1.4"
 log = "0.4"
 parking_lot = "0.11"
 puffin = "0.11.0"
