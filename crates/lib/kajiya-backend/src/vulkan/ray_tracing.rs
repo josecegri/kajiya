@@ -1,12 +1,12 @@
 use std::sync::Arc;
 
-use crate::{dynamic_constants::DynamicConstants, BackendError, MAX_DESCRIPTOR_SETS};
+use crate::{BackendError, MAX_DESCRIPTOR_SETS, dynamic_constants::DynamicConstants};
 
 use super::{
     device::Device,
     shader::{
-        merge_shader_stage_layouts, DescriptorSetLayoutOpts, PipelineShader, ShaderPipelineCommon,
-        ShaderPipelineStage,
+        DescriptorSetLayoutOpts, PipelineShader, ShaderPipelineCommon, ShaderPipelineStage,
+        merge_shader_stage_layouts,
     },
 };
 use ash::vk;
@@ -249,9 +249,11 @@ impl Device {
             })
             .build();
 
-        let build_range_infos = vec![ash::vk::AccelerationStructureBuildRangeInfoKHR::builder()
-            .primitive_count(instances.len() as _)
-            .build()];
+        let build_range_infos = vec![
+            ash::vk::AccelerationStructureBuildRangeInfoKHR::builder()
+                .primitive_count(instances.len() as _)
+                .build(),
+        ];
 
         let geometry_info = ash::vk::AccelerationStructureBuildGeometryInfoKHR::builder()
             .ty(ash::vk::AccelerationStructureTypeKHR::TOP_LEVEL)
@@ -471,9 +473,11 @@ impl Device {
             })
             .build();
 
-        let build_range_infos = vec![ash::vk::AccelerationStructureBuildRangeInfoKHR::builder()
-            .primitive_count(instance_count as _)
-            .build()];
+        let build_range_infos = vec![
+            ash::vk::AccelerationStructureBuildRangeInfoKHR::builder()
+                .primitive_count(instance_count as _)
+                .build(),
+        ];
 
         let geometry_info = ash::vk::AccelerationStructureBuildGeometryInfoKHR::builder()
             .ty(ash::vk::AccelerationStructureTypeKHR::TOP_LEVEL)

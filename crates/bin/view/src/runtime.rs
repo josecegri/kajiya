@@ -10,17 +10,17 @@ use kajiya::{
 use kajiya_simple::*;
 
 use crate::{
+    PersistedState,
     opt::Opt,
     persisted::{MeshSource, SceneElement, SceneElementTransform, ShouldResetPathTracer as _},
     scene::SceneDesc,
     sequence::{CameraPlaybackSequence, MemOption, SequenceValue},
-    PersistedState,
 };
 
 use crate::keymap::KeymapConfig;
 use log::{info, warn};
 use std::{
-    collections::{hash_map::DefaultHasher, HashMap},
+    collections::{HashMap, hash_map::DefaultHasher},
     fs::File,
     hash::{Hash, Hasher},
     path::PathBuf,

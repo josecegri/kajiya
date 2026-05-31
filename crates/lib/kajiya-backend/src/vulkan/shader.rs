@@ -12,7 +12,7 @@ use bytes::Bytes;
 use derive_builder::Builder;
 use parking_lot::Mutex;
 use std::{
-    collections::{hash_map::Entry, HashMap},
+    collections::{HashMap, hash_map::Entry},
     ffi::CString,
     path::PathBuf,
     sync::Arc,

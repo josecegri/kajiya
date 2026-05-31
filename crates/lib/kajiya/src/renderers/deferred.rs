@@ -2,7 +2,7 @@ use kajiya_backend::{ash::vk, vulkan::image::*};
 use kajiya_rg::{self as rg};
 use rg::{RenderGraph, SimpleRenderPass};
 
-use super::{ircache::IrcacheRenderState, wrc::WrcRenderState, GbufferDepth};
+use super::{GbufferDepth, ircache::IrcacheRenderState, wrc::WrcRenderState};
 
 #[allow(clippy::too_many_arguments)]
 pub fn light_gbuffer(

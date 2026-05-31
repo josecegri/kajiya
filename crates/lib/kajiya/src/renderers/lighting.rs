@@ -4,7 +4,7 @@ use kajiya_backend::{
 };
 use kajiya_rg::{self as rg, SimpleRenderPass};
 
-use super::{rtr::SPATIAL_RESOLVE_OFFSETS, GbufferDepth};
+use super::{GbufferDepth, rtr::SPATIAL_RESOLVE_OFFSETS};
 
 pub struct LightingRenderer {}
 

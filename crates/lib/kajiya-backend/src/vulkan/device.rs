@@ -1,4 +1,4 @@
-use crate::{vulkan::buffer::BufferDesc, BackendError};
+use crate::{BackendError, vulkan::buffer::BufferDesc};
 
 pub use super::profiler::VkProfilerData;
 use super::{

@@ -1,16 +1,16 @@
 use std::sync::Arc;
 
 use kajiya_backend::{
+    BackendError, Device,
     ash::vk,
     vk_sync,
     vulkan::{buffer::*, image::*, ray_tracing::RayTracingAcceleration, shader::ShaderSource},
-    BackendError, Device,
 };
 use kajiya_rg::{self as rg, SimpleRenderPass};
 
 use super::{
-    ircache::IrcacheRenderState, rtdgi::RtdgiCandidates, wrc::WrcRenderState, GbufferDepth,
-    PingPongTemporalResource,
+    GbufferDepth, PingPongTemporalResource, ircache::IrcacheRenderState, rtdgi::RtdgiCandidates,
+    wrc::WrcRenderState,
 };
 
 use blue_noise_sampler::spp64::*;

@@ -1,7 +1,7 @@
 use std::{intrinsics::transmute, ptr};
 
 use glam::Vec2;
-use kajiya_backend::{ash::vk, vk_sync::AccessType, vulkan::image::*, RenderBackend};
+use kajiya_backend::{RenderBackend, ash::vk, vk_sync::AccessType, vulkan::image::*};
 use kajiya_rg::{self as rg};
 use ngx_dlss::*;
 use wchar::wchz;

@@ -5,7 +5,7 @@ use kajiya_backend::{
 use kajiya_rg::{self as rg, SimpleRenderPass};
 
 use super::{
-    ircache::IrcacheRenderState, wrc::WrcRenderState, GbufferDepth, PingPongTemporalResource,
+    GbufferDepth, PingPongTemporalResource, ircache::IrcacheRenderState, wrc::WrcRenderState,
 };
 
 pub struct RtdgiRenderer {

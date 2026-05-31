@@ -1,5 +1,5 @@
 use crate::file::LoadFile;
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{Context, Result, anyhow, bail};
 use bytes::Bytes;
 use relative_path::RelativePathBuf;
 use std::{path::PathBuf, sync::Arc};

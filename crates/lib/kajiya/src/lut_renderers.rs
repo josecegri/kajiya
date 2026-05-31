@@ -1,4 +1,4 @@
-use kajiya_backend::{ash::vk, vk_sync::AccessType, ImageDesc};
+use kajiya_backend::{ImageDesc, ash::vk, vk_sync::AccessType};
 use kajiya_rg::{BindRgRef, IntoRenderPassPipelineBinding};
 
 #[allow(unused_imports)]

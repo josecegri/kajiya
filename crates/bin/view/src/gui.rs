@@ -3,8 +3,8 @@ use kajiya::RenderOverrideFlags;
 use kajiya_simple::*;
 
 use crate::{
-    runtime::{RuntimeState, MAX_FPS_LIMIT},
     PersistedState,
+    runtime::{MAX_FPS_LIMIT, RuntimeState},
 };
 
 impl RuntimeState {

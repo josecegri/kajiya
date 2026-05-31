@@ -3,15 +3,16 @@
 use crate::{renderer::FrameConstantsLayout, resource_registry::PendingRenderResourceInfo};
 
 use super::{
+    RenderPassApi,
     pass_builder::PassBuilder,
     resource::*,
     resource_registry::{
         AnyRenderResource, AnyRenderResourceRef, RegistryResource, ResourceRegistry,
     },
-    RenderPassApi,
 };
 
 use kajiya_backend::{
+    BackendError,
     ash::{
         extensions::khr::Swapchain,
         vk::{self, DebugUtilsLabelEXT},
@@ -25,15 +26,14 @@ use kajiya_backend::{
     vk_sync,
     vulkan::{
         barrier::{
-            get_access_info, image_aspect_mask_from_access_type_and_format, record_image_barrier,
-            ImageBarrier,
+            ImageBarrier, get_access_info, image_aspect_mask_from_access_type_and_format,
+            record_image_barrier,
         },
         device::{CommandBuffer, Device, VkProfilerData},
         image::ImageViewDesc,
         ray_tracing::{RayTracingAcceleration, RayTracingPipelineDesc},
         shader::{ComputePipelineDesc, PipelineShader, PipelineShaderDesc, RasterPipelineDesc},
     },
-    BackendError,
 };
 use parking_lot::Mutex;
 use std::{
@@ -510,7 +510,9 @@ impl RenderGraph {
                         desc: GraphResourceDesc::RayTracingAcceleration(_),
                         ..
                     }) => {
-                        unimplemented!("Creation of acceleration structures via the render graph is not currently supported");
+                        unimplemented!(
+                            "Creation of acceleration structures via the render graph is not currently supported"
+                        );
                     }
                     GraphResourceInfo::Imported(
                         GraphResourceImportInfo::RayTracingAcceleration { .. },
@@ -1152,8 +1154,10 @@ impl RetiredRenderGraph {
                 }
                 AnyRenderResource::ImportedImage(_)
                 | AnyRenderResource::ImportedBuffer(_)
-                | AnyRenderResource::ImportedRayTracingAcceleration(_) => {},
-                AnyRenderResource::Pending { .. } => panic!("RetiredRenderGraph::release_resources called while a resource was in Pending state"),
+                | AnyRenderResource::ImportedRayTracingAcceleration(_) => {}
+                AnyRenderResource::Pending { .. } => panic!(
+                    "RetiredRenderGraph::release_resources called while a resource was in Pending state"
+                ),
             }
         }
     }

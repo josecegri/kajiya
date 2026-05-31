@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use kajiya_backend::{ash::vk, vk_sync::AccessType, vulkan::image::*, BackendError, Device};
+use kajiya_backend::{BackendError, Device, ash::vk, vk_sync::AccessType, vulkan::image::*};
 use kajiya_rg::{self as rg};
 use rg::{Buffer, BufferDesc, RenderGraph, SimpleRenderPass};
 

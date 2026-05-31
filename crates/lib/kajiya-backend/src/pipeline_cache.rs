@@ -2,7 +2,7 @@ use crate::{
     rust_shader_compiler::CompileRustShader,
     shader_compiler::{CompileShader, CompiledShader},
     vulkan::{
-        ray_tracing::{create_ray_tracing_pipeline, RayTracingPipeline, RayTracingPipelineDesc},
+        ray_tracing::{RayTracingPipeline, RayTracingPipelineDesc, create_ray_tracing_pipeline},
         shader::*,
     },
 };

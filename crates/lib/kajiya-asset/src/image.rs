@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
 use bytes::Bytes;
-use image::{imageops::FilterType, DynamicImage, GenericImageView as _, ImageBuffer, Rgba};
+use image::{DynamicImage, GenericImageView as _, ImageBuffer, Rgba, imageops::FilterType};
 use intel_tex_2::{bc5, bc7};
-use kajiya_backend::{ash::vk, file::LoadFile, ImageDesc};
+use kajiya_backend::{ImageDesc, ash::vk, file::LoadFile};
 use turbosloth::*;
 
 use crate::mesh::TexCompressionMode;

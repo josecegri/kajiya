@@ -1,8 +1,8 @@
 use std::{hash::Hash, sync::Arc};
 
-use image::{imageops::FilterType, DynamicImage, GenericImageView};
+use image::{DynamicImage, GenericImageView, imageops::FilterType};
 use kajiya_asset::{image::RawImage, mesh::TexParams};
-use kajiya_backend::{ash::vk, Device, Image, ImageDesc, ImageSubResourceData};
+use kajiya_backend::{Device, Image, ImageDesc, ImageSubResourceData, ash::vk};
 use turbosloth::*;
 
 #[derive(Clone)]
