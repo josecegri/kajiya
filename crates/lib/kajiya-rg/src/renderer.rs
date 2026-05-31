@@ -16,7 +16,7 @@ use kajiya_backend::{
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 use std::{
-    collections::HashMap,
+    collections::BTreeMap,
     sync::{Arc, LazyLock},
 };
 use turbosloth::*;
@@ -45,7 +45,7 @@ pub struct Renderer {
     temporal_rg_state: TemporalRg,
 }
 
-static FRAME_CONSTANTS_LAYOUT: LazyLock<HashMap<u32, rspirv_reflect::DescriptorInfo>> =
+static FRAME_CONSTANTS_LAYOUT: LazyLock<BTreeMap<u32, rspirv_reflect::DescriptorInfo>> =
     LazyLock::new(|| {
         [
             // frame_constants
@@ -53,7 +53,7 @@ static FRAME_CONSTANTS_LAYOUT: LazyLock<HashMap<u32, rspirv_reflect::DescriptorI
                 0,
                 rspirv_reflect::DescriptorInfo {
                     ty: rspirv_reflect::DescriptorType::UNIFORM_BUFFER,
-                    dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
+                    binding_count: rspirv_reflect::BindingCount::One,
                     name: Default::default(),
                 },
             ),
@@ -62,7 +62,7 @@ static FRAME_CONSTANTS_LAYOUT: LazyLock<HashMap<u32, rspirv_reflect::DescriptorI
                 1,
                 rspirv_reflect::DescriptorInfo {
                     ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER_DYNAMIC,
-                    dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
+                    binding_count: rspirv_reflect::BindingCount::One,
                     name: Default::default(),
                 },
             ),
@@ -71,7 +71,7 @@ static FRAME_CONSTANTS_LAYOUT: LazyLock<HashMap<u32, rspirv_reflect::DescriptorI
                 2,
                 rspirv_reflect::DescriptorInfo {
                     ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER_DYNAMIC,
-                    dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
+                    binding_count: rspirv_reflect::BindingCount::One,
                     name: Default::default(),
                 },
             ),

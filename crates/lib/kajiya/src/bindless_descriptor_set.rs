@@ -1,8 +1,8 @@
-use std::{collections::HashMap, sync::LazyLock};
+use std::{collections::BTreeMap, sync::LazyLock};
 
 use kajiya_backend::{ash::vk, rspirv_reflect, vulkan::device};
 
-pub static BINDLESS_DESCRIPTOR_SET_LAYOUT: LazyLock<HashMap<u32, rspirv_reflect::DescriptorInfo>> =
+pub static BINDLESS_DESCRIPTOR_SET_LAYOUT: LazyLock<BTreeMap<u32, rspirv_reflect::DescriptorInfo>> =
     LazyLock::new(|| {
         [
             // `meshes`
@@ -10,7 +10,7 @@ pub static BINDLESS_DESCRIPTOR_SET_LAYOUT: LazyLock<HashMap<u32, rspirv_reflect:
                 0,
                 rspirv_reflect::DescriptorInfo {
                     ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER,
-                    dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
+                    binding_count: rspirv_reflect::BindingCount::One,
                     name: Default::default(),
                 },
             ),
@@ -19,7 +19,7 @@ pub static BINDLESS_DESCRIPTOR_SET_LAYOUT: LazyLock<HashMap<u32, rspirv_reflect:
                 1,
                 rspirv_reflect::DescriptorInfo {
                     ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER,
-                    dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
+                    binding_count: rspirv_reflect::BindingCount::One,
                     name: Default::default(),
                 },
             ),
@@ -28,7 +28,7 @@ pub static BINDLESS_DESCRIPTOR_SET_LAYOUT: LazyLock<HashMap<u32, rspirv_reflect:
                 2,
                 rspirv_reflect::DescriptorInfo {
                     ty: rspirv_reflect::DescriptorType::STORAGE_BUFFER,
-                    dimensionality: rspirv_reflect::DescriptorDimensionality::Single,
+                    binding_count: rspirv_reflect::BindingCount::One,
                     name: Default::default(),
                 },
             ),
@@ -37,7 +37,7 @@ pub static BINDLESS_DESCRIPTOR_SET_LAYOUT: LazyLock<HashMap<u32, rspirv_reflect:
                 BINDLESS_TEXURES_BINDING_INDEX as u32,
                 rspirv_reflect::DescriptorInfo {
                     ty: rspirv_reflect::DescriptorType::SAMPLED_IMAGE,
-                    dimensionality: rspirv_reflect::DescriptorDimensionality::RuntimeArray,
+                    binding_count: rspirv_reflect::BindingCount::Unbounded,
                     name: Default::default(),
                 },
             ),

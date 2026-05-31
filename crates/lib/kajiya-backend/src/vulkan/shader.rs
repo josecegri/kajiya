@@ -12,7 +12,7 @@ use bytes::Bytes;
 use derive_builder::Builder;
 use parking_lot::Mutex;
 use std::{
-    collections::{HashMap, hash_map::Entry},
+    collections::{BTreeMap, HashMap, btree_map::Entry},
     ffi::CString,
     path::PathBuf,
     sync::Arc,
@@ -20,8 +20,8 @@ use std::{
 
 pub const MAX_DESCRIPTOR_SETS: usize = 4;
 
-type DescriptorSetLayout = HashMap<u32, rspirv_reflect::DescriptorInfo>;
-type StageDescriptorSetLayouts = HashMap<u32, DescriptorSetLayout>;
+type DescriptorSetLayout = BTreeMap<u32, rspirv_reflect::DescriptorInfo>;
+type StageDescriptorSetLayouts = BTreeMap<u32, DescriptorSetLayout>;
 
 pub struct ShaderPipelineCommon {
     pub pipeline_layout: vk::PipelineLayout,
@@ -172,8 +172,8 @@ pub fn create_descriptor_set_layouts(
                     ),
                     rspirv_reflect::DescriptorType::SAMPLED_IMAGE => {
                         if matches!(
-                            binding.dimensionality,
-                            rspirv_reflect::DescriptorDimensionality::RuntimeArray
+                            binding.binding_count,
+                            rspirv_reflect::BindingCount::Unbounded
                         ) {
                             // Bindless
 
@@ -187,10 +187,10 @@ pub fn create_descriptor_set_layouts(
                                 vk::DescriptorSetLayoutCreateFlags::UPDATE_AFTER_BIND_POOL;
                         }
 
-                        let descriptor_count = match binding.dimensionality {
-                            rspirv_reflect::DescriptorDimensionality::Single => 1,
-                            rspirv_reflect::DescriptorDimensionality::Array(size) => size,
-                            rspirv_reflect::DescriptorDimensionality::RuntimeArray => {
+                        let descriptor_count = match binding.binding_count {
+                            rspirv_reflect::BindingCount::One => 1,
+                            rspirv_reflect::BindingCount::StaticSized(size) => size as u32,
+                            rspirv_reflect::BindingCount::Unbounded => {
                                 device.max_bindless_descriptor_count()
                             }
                         };

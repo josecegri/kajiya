@@ -27,8 +27,8 @@ parking_lot = "0.11"
 puffin = "0.11.0"
 raw-window-handle = "0.3"
 relative-path = "1.3"
-rspirv = "0.7"  # note: patched over for latest RT
-rspirv-reflect = { git = "https://github.com/h3r2tic/rspirv-reflect", rev = "77364f98cbfb5c7ee3aa1347158670a9b8ec5bf5" }
+rspirv = "0.13.0"
+rspirv-reflect = "0.9.0"
 shader-prepper = "0.3.0-pre.1"
 smol = "1.2.5"
 thiserror = "1.0"

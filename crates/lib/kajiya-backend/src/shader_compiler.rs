@@ -147,12 +147,11 @@ pub fn get_cs_local_size_from_spirv(spirv: &[u32]) -> Result<[u32; 3]> {
     let module = loader.module();
 
     for inst in module.global_inst_iter() {
-        //if spirv_headers::Op::ExecutionMode == inst.class.opcode {
-        if inst.class.opcode as u32 == 16 {
+        if inst.class.opcode == rspirv::spirv::Op::ExecutionMode {
             let local_size = &inst.operands[2..5];
-            use rspirv::dr::Operand::LiteralInt32;
+            use rspirv::dr::Operand::LiteralBit32;
 
-            if let [LiteralInt32(x), LiteralInt32(y), LiteralInt32(z)] = *local_size {
+            if let [LiteralBit32(x), LiteralBit32(y), LiteralBit32(z)] = *local_size {
                 return Ok([x, y, z]);
             } else {
                 bail!("Could not parse the ExecutionMode SPIR-V op");

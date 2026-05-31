@@ -37,7 +37,7 @@ use kajiya_backend::{
 };
 use parking_lot::Mutex;
 use std::{
-    collections::{HashMap, VecDeque},
+    collections::{BTreeMap, HashMap, VecDeque},
     ffi::CString,
     hash::Hash,
     marker::PhantomData,
@@ -117,7 +117,7 @@ pub(crate) struct RgRtPipeline {
 }
 
 pub struct PredefinedDescriptorSet {
-    pub bindings: HashMap<u32, rspirv_reflect::DescriptorInfo>,
+    pub bindings: BTreeMap<u32, rspirv_reflect::DescriptorInfo>,
 }
 
 #[derive(Clone, PartialEq, Eq, Hash)]
