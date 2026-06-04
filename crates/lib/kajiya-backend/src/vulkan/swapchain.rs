@@ -1,6 +1,6 @@
 use super::{device::Device, surface::Surface};
 use anyhow::Result;
-use ash::{extensions::khr, vk};
+use ash::{khr, vk};
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 use std::sync::Arc;
@@ -13,7 +13,7 @@ pub struct SwapchainDesc {
 }
 
 pub struct Swapchain {
-    pub(crate) fns: khr::Swapchain,
+    pub(crate) fns: khr::swapchain::Device,
     pub(crate) raw: vk::SwapchainKHR,
     pub desc: SwapchainDesc,
     pub images: Vec<Arc<crate::Image>>,
@@ -109,7 +109,7 @@ impl Swapchain {
             surface_capabilities.current_transform
         };
 
-        let swapchain_create_info = vk::SwapchainCreateInfoKHR::builder()
+        let swapchain_create_info = vk::SwapchainCreateInfoKHR::default()
             .surface(surface.raw)
             .min_image_count(desired_image_count)
             .image_color_space(desc.format.color_space)
@@ -121,10 +121,9 @@ impl Swapchain {
             .composite_alpha(vk::CompositeAlphaFlagsKHR::OPAQUE)
             .present_mode(present_mode)
             .clipped(true)
-            .image_array_layers(1)
-            .build();
+            .image_array_layers(1);
 
-        let fns = khr::Swapchain::new(&device.instance.raw, &device.raw);
+        let fns = khr::swapchain::Device::new(&device.instance.raw, &device.raw);
         let swapchain = unsafe { fns.create_swapchain(&swapchain_create_info, None) }.unwrap();
 
         let vk_images = unsafe { fns.get_swapchain_images(swapchain) }.unwrap();
@@ -264,7 +263,7 @@ impl Swapchain {
     pub fn present_image(&self, image: SwapchainImage) {
         puffin::profile_function!();
 
-        let present_info = vk::PresentInfoKHR::builder()
+        let present_info = vk::PresentInfoKHR::default()
             .wait_semaphores(std::slice::from_ref(&image.rendering_finished_semaphore))
             .swapchains(std::slice::from_ref(&self.raw))
             .image_indices(std::slice::from_ref(&image.image_index));

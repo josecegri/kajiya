@@ -1,5 +1,5 @@
 use anyhow::Result;
-use ash::{extensions::ext, vk};
+use ash::{ext, vk};
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 use std::{
@@ -37,8 +37,8 @@ pub struct Instance {
     pub(crate) debug_callback: Option<vk::DebugReportCallbackEXT>,
     #[allow(dead_code)]
     #[allow(deprecated)]
-    pub(crate) debug_loader: Option<ext::DebugReport>,
-    pub(crate) debug_utils: Option<ash::extensions::ext::DebugUtils>,
+    pub(crate) debug_loader: Option<ext::debug_report::Instance>,
+    pub(crate) debug_utils: Option<ext::debug_utils::Instance>,
 }
 
 impl Instance {
@@ -47,12 +47,12 @@ impl Instance {
     }
 
     fn extension_names(builder: &DeviceBuilder) -> Vec<*const i8> {
-        let mut names = vec![vk::KhrGetPhysicalDeviceProperties2Fn::name().as_ptr()];
+        let mut names = vec![vk::KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_NAME.as_ptr()];
 
         if builder.graphics_debugging {
             #[allow(deprecated)]
-            names.push(ext::DebugReport::name().as_ptr());
-            names.push(vk::ExtDebugUtilsFn::name().as_ptr());
+            names.push(ext::debug_report::NAME.as_ptr());
+            names.push(ext::debug_utils::NAME.as_ptr());
         }
 
         names
@@ -67,7 +67,7 @@ impl Instance {
     }
 
     fn create(builder: DeviceBuilder) -> Result<Self> {
-        let entry = unsafe { ash::Entry::new()? };
+        let entry = ash::Entry::linked();
         let instance_extensions = builder
             .required_extensions
             .iter()
@@ -81,9 +81,9 @@ impl Instance {
             .map(|raw_name| raw_name.as_ptr())
             .collect();
 
-        let app_desc = vk::ApplicationInfo::builder().api_version(vk::make_api_version(0, 1, 2, 0));
+        let app_desc = vk::ApplicationInfo::default().api_version(vk::make_api_version(0, 1, 2, 0));
 
-        let instance_desc = vk::InstanceCreateInfo::builder()
+        let instance_desc = vk::InstanceCreateInfo::default()
             .application_info(&app_desc)
             .enabled_layer_names(&layer_names)
             .enabled_extension_names(&instance_extensions);
@@ -101,7 +101,7 @@ impl Instance {
             };
 
             #[allow(deprecated)]
-            let debug_loader = ext::DebugReport::new(&entry, &instance);
+            let debug_loader = ext::debug_report::Instance::new(&entry, &instance);
 
             let debug_callback = unsafe {
                 #[allow(deprecated)]
@@ -110,7 +110,7 @@ impl Instance {
                     .unwrap()
             };
 
-            let debug_utils = ash::extensions::ext::DebugUtils::new(&entry, &instance);
+            let debug_utils = ash::ext::debug_utils::Instance::new(&entry, &instance);
 
             (Some(debug_loader), Some(debug_callback), Some(debug_utils))
         } else {

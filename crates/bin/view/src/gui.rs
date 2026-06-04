@@ -1,20 +1,23 @@
-use imgui::im_str;
-use kajiya::RenderOverrideFlags;
+// use imgui::im_str;
+// use kajiya::RenderOverrideFlags;
 use kajiya_simple::*;
 
 use crate::{
     PersistedState,
-    runtime::{MAX_FPS_LIMIT, RuntimeState},
+    //runtime::{MAX_FPS_LIMIT, RuntimeState},
+    runtime::RuntimeState,
 };
 
 impl RuntimeState {
-    pub fn do_gui(&mut self, persisted: &mut PersistedState, ctx: &mut FrameContext) {
+    pub fn do_gui(&mut self, _persisted: &mut PersistedState, ctx: &mut FrameContext) {
         if self.keyboard.was_just_pressed(self.keymap_config.ui.toggle) {
             self.show_gui = !self.show_gui;
         }
 
         ctx.world_renderer.rg_debug_hook = self.locked_rg_debug_hook.clone();
 
+        // TODO restore gui rendering
+        /*
         if self.show_gui {
             ctx.imgui.take().unwrap().frame(|ui| {
                 if imgui::CollapsingHeader::new(im_str!("Tweaks"))
@@ -471,5 +474,6 @@ impl RuntimeState {
                 }
             });
         }
+        */
     }
 }

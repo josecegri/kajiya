@@ -13,10 +13,7 @@ use super::{
 
 use kajiya_backend::{
     BackendError,
-    ash::{
-        extensions::khr::Swapchain,
-        vk::{self, DebugUtilsLabelEXT},
-    },
+    ash::vk::{self, DebugUtilsLabelEXT},
     dynamic_constants::DynamicConstants,
     pipeline_cache::{
         ComputePipelineHandle, PipelineCache, RasterPipelineHandle, RtPipelineHandle,
@@ -931,10 +928,10 @@ impl<'exec_params, 'constants> ExecutingRenderGraph<'exec_params, 'constants> {
             .device
             .record_crash_marker(cb, format!("begin render pass {:?}", pass.name));
 
-        if let Some(debug_utils) = params.device.debug_utils() {
+        if let Some(debug_utils) = params.device.debug_utils_device() {
             unsafe {
                 let label: CString = CString::new(pass.name.as_str()).unwrap();
-                let label = DebugUtilsLabelEXT::builder().label_name(&label).build();
+                let label = DebugUtilsLabelEXT::default().label_name(&label);
                 debug_utils.cmd_begin_debug_utils_label(cb.raw, &label);
             }
         }
@@ -1000,7 +997,7 @@ impl<'exec_params, 'constants> ExecutingRenderGraph<'exec_params, 'constants> {
             .profiler_data
             .end_scope(&params.device.raw, cb.raw, vk_scope);
 
-        if let Some(debug_utils) = params.device.debug_utils() {
+        if let Some(debug_utils) = params.device.debug_utils_device() {
             unsafe {
                 debug_utils.cmd_end_debug_utils_label(cb.raw);
             }

@@ -36,7 +36,8 @@ impl AppState {
             .default_log_level(log::LevelFilter::Info)
             .fullscreen(opt.fullscreen.then_some(FullscreenMode::Exclusive))
             .build(
-                WindowBuilder::new()
+                WindowAttributes::default()
+                    .with_position(PhysicalPosition::new(0, 0))
                     .with_title("kajiya")
                     .with_resizable(false)
                     .with_decorations(!opt.no_window_decorations),

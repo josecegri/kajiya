@@ -16,10 +16,10 @@ array-init = "2.0.0"
 blue-noise-sampler = "0.1"
 bytemuck = "1.9.1"
 chrono = "0.4"
-exr = "1.4.1"
+exr = "1.74.0"
 fern = { version = "0.6", features = ["colored"] }
 glam = "0.22"
-half = { version = "1.8.2", features = ["bytemuck"] }
+half = { version = "2.7.1", features = ["bytemuck"] }
 image = { version = "0.23.13", default-features = false, features = ["gif", "jpeg", "ico", "png", "pnm", "tga", "tiff", "webp", "bmp", "hdr", "dxt"] }
 log = "0.4"
 memmap2 = "0.2"

@@ -14,8 +14,8 @@ pub mod swapchain;
 use ash::vk;
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
-use raw_window_handle::HasRawWindowHandle;
-use std::sync::Arc;
+use raw_window_handle::{HasDisplayHandle, HasWindowHandle};
+use std::{ffi::CStr, sync::Arc};
 
 fn select_surface_format(formats: Vec<vk::SurfaceFormatKHR>) -> Option<vk::SurfaceFormatKHR> {
     let preferred = vk::SurfaceFormatKHR {
@@ -45,12 +45,19 @@ pub struct RenderBackendConfig {
 }
 
 impl RenderBackend {
-    pub fn new(
-        window: &impl HasRawWindowHandle,
-        config: RenderBackendConfig,
-    ) -> anyhow::Result<Self> {
+    pub fn new<W>(window: &W, config: RenderBackendConfig) -> anyhow::Result<Self>
+    where
+        W: HasDisplayHandle + HasWindowHandle,
+    {
+        let required_exts =
+            ash_window::enumerate_required_extensions(window.display_handle().unwrap().as_raw())
+                .unwrap()
+                .iter()
+                .map(|ext| unsafe { CStr::from_ptr(*ext) })
+                .collect::<Vec<_>>();
+
         let instance = instance::Instance::builder()
-            .required_extensions(ash_window::enumerate_required_extensions(window).unwrap())
+            .required_extensions(required_exts)
             .graphics_debugging(config.graphics_debugging)
             .build()?;
         let surface = surface::Surface::create(&instance, window)?;
@@ -90,7 +97,7 @@ impl RenderBackend {
 
         info!("Selected physical device: {:#?}", *physical_device);
 
-        let device = device::Device::create(&physical_device)?;
+        let device = device::Device::create(&physical_device, config.graphics_debugging)?;
         let surface_formats = swapchain::Swapchain::enumerate_surface_formats(&device, &surface)?;
 
         info!("Available surface formats: {:#?}", surface_formats);

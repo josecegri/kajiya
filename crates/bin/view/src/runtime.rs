@@ -201,14 +201,18 @@ impl RuntimeState {
 
         // When starting camera rotation, hide the mouse cursor, and capture it to the window.
         if (self.mouse.buttons_pressed & (1 << 2)) != 0 {
-            let _ = ctx.window.set_cursor_grab(true);
+            let _ = ctx
+                .window
+                .set_cursor_grab(winit::window::CursorGrabMode::Confined);
             self.grab_cursor_pos = self.mouse.physical_position;
             ctx.window.set_cursor_visible(false);
         }
 
         // When ending camera rotation, release the cursor.
         if (self.mouse.buttons_released & (1 << 2)) != 0 {
-            let _ = ctx.window.set_cursor_grab(false);
+            let _ = ctx
+                .window
+                .set_cursor_grab(winit::window::CursorGrabMode::None);
             ctx.window.set_cursor_visible(true);
         }
 
@@ -507,6 +511,7 @@ impl RuntimeState {
         }
     }
 
+    #[expect(unused)]
     pub fn is_sequence_playing(&self) -> bool {
         matches!(
             &self.sequence_playback_state,
@@ -548,6 +553,7 @@ impl RuntimeState {
         }
     }
 
+    #[expect(unused)]
     pub fn jump_to_sequence_key(&mut self, persisted: &mut PersistedState, idx: usize) {
         let exact_item = if let Some(item) = persisted.sequence.get_item(idx) {
             item.clone()
@@ -582,6 +588,7 @@ impl RuntimeState {
         self.sequence_playback_state = SequencePlaybackState::NotPlaying;
     }
 
+    #[expect(unused)]
     pub fn replace_camera_sequence_key(&mut self, persisted: &mut PersistedState, idx: usize) {
         persisted.sequence.each_key(|i, item| {
             if idx != i {
@@ -594,6 +601,7 @@ impl RuntimeState {
         })
     }
 
+    #[expect(unused)]
     pub fn delete_camera_sequence_key(&mut self, persisted: &mut PersistedState, idx: usize) {
         persisted.sequence.delete_key(idx);
 

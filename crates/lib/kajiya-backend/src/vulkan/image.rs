@@ -5,7 +5,8 @@ use crate::BackendError;
 use super::device::Device;
 use ash::vk;
 use derive_builder::Builder;
-use gpu_allocator::{AllocationCreateDesc, MemoryLocation};
+use gpu_allocator::MemoryLocation;
+use gpu_allocator::vulkan::{AllocationCreateDesc, AllocationScheme};
 use parking_lot::Mutex;
 use std::collections::HashMap;
 
@@ -186,12 +187,12 @@ impl Image {
         }
     }
 
-    pub fn view_desc(&self, desc: &ImageViewDesc) -> vk::ImageViewCreateInfo {
+    pub fn view_desc(&self, desc: &ImageViewDesc) -> vk::ImageViewCreateInfo<'_> {
         Self::view_desc_impl(*desc, &self.desc)
     }
 
-    fn view_desc_impl(desc: ImageViewDesc, image_desc: &ImageDesc) -> vk::ImageViewCreateInfo {
-        vk::ImageViewCreateInfo::builder()
+    fn view_desc_impl(desc: ImageViewDesc, image_desc: &ImageDesc) -> vk::ImageViewCreateInfo<'_> {
+        vk::ImageViewCreateInfo::default()
             .format(desc.format.unwrap_or(image_desc.format))
             .components(vk::ComponentMapping {
                 r: vk::ComponentSwizzle::R,
@@ -214,7 +215,6 @@ impl Image {
                     _ => 1,
                 },
             })
-            .build()
     }
 }
 
@@ -280,6 +280,7 @@ impl Device {
                 requirements,
                 location: MemoryLocation::GpuOnly,
                 linear: false,
+                allocation_scheme: AllocationScheme::GpuAllocatorManaged,
             })
             .map_err(|err| BackendError::Allocation {
                 inner: err,
@@ -331,14 +332,13 @@ impl Device {
                     mapped_slice_mut[offset..offset + sub.data.len()].copy_from_slice(sub.data);
                     assert_eq!(offset % block_bytes, 0);
 
-                    let region = vk::BufferImageCopy::builder()
+                    let region = vk::BufferImageCopy::default()
                         .buffer_offset(offset as _)
                         .image_subresource(
-                            vk::ImageSubresourceLayers::builder()
+                            vk::ImageSubresourceLayers::default()
                                 .aspect_mask(vk::ImageAspectFlags::COLOR)
                                 .layer_count(1)
-                                .mip_level(level as _)
-                                .build(),
+                                .mip_level(level as _),
                         )
                         .image_extent(vk::Extent3D {
                             width: (desc.extent[0] >> level).max(1),
@@ -347,7 +347,6 @@ impl Device {
                         });
 
                     offset += sub.data.len();
-                    let region = region.build();
 
                     //dbg!(region);
                     //dbg!(total_initial_data_bytes);
@@ -454,7 +453,7 @@ pub fn convert_image_type_to_view_type(image_type: ImageType) -> vk::ImageViewTy
     }
 }
 
-pub fn get_image_create_info(desc: &ImageDesc, initial_data: bool) -> vk::ImageCreateInfo {
+pub fn get_image_create_info(desc: &ImageDesc, initial_data: bool) -> vk::ImageCreateInfo<'_> {
     let (image_type, image_extent, image_layers) = match desc.image_type {
         ImageType::Tex1d => (
             vk::ImageType::TYPE_1D,

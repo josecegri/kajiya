@@ -40,6 +40,7 @@ impl LazyWorker for CompileShader {
                 Ok(CompiledShader { name, spirv })
             }
             "hlsl" => {
+                // TODO fix HLSL shader compilation warnings emitted by validation
                 let file_path = self.path.to_str().unwrap().to_owned();
                 let source = shader_prepper::process_file(
                     &file_path,

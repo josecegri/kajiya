@@ -1,5 +1,8 @@
 use anyhow::{Context, anyhow};
-use kajiya_simple::{KeyMap, KeyboardMap, VirtualKeyCode, VirtualKeyCode::*};
+use kajiya_simple::{
+    KeyMap, KeyboardMap,
+    winit::keyboard::{KeyCode, PhysicalKey},
+};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::{File, canonicalize},
@@ -32,6 +35,7 @@ impl KeymapConfig {
             .read_to_string(&mut buffer)
             .with_context(|| "Failed to read keymap.toml")?;
 
+        // TODO restore keymap.toml file parsing
         // Don't use anyhow context here because it doesn't show the parsing error.
         let keymap = from_str(&buffer)
             .map_err(|e| anyhow!("Failed to parse keymap.toml: {}", e.to_string()))?;
@@ -56,65 +60,67 @@ impl From<Movement> for KeyboardMap {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Movement {
-    forward: VirtualKeyCode,
-    backward: VirtualKeyCode,
-    left: VirtualKeyCode,
-    right: VirtualKeyCode,
-    up: VirtualKeyCode,
-    down: VirtualKeyCode,
-    boost: VirtualKeyCode,
-    slow: VirtualKeyCode,
+    forward: PhysicalKey,
+    backward: PhysicalKey,
+    left: PhysicalKey,
+    right: PhysicalKey,
+    up: PhysicalKey,
+    down: PhysicalKey,
+    boost: PhysicalKey,
+    slow: PhysicalKey,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Ui {
-    pub toggle: VirtualKeyCode,
+    pub toggle: PhysicalKey,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Sequencer {
-    pub add_keyframe: VirtualKeyCode,
-    pub play: VirtualKeyCode,
+    pub add_keyframe: PhysicalKey,
+    pub play: PhysicalKey,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Rendering {
-    pub switch_to_reference_path_tracing: VirtualKeyCode,
-    pub reset_path_tracer: VirtualKeyCode,
-    pub light_enable_emissive: VirtualKeyCode,
+    pub switch_to_reference_path_tracing: PhysicalKey,
+    pub reset_path_tracer: PhysicalKey,
+    pub light_enable_emissive: PhysicalKey,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Misc {
-    pub print_camera_transform: VirtualKeyCode,
+    pub print_camera_transform: PhysicalKey,
 }
 
 impl Default for Movement {
     fn default() -> Self {
         Self {
-            forward: W,
-            backward: S,
-            left: A,
-            right: D,
-            up: E,
-            down: Q,
-            boost: LShift,
-            slow: LControl,
+            forward: PhysicalKey::Code(KeyCode::KeyW),
+            backward: PhysicalKey::Code(KeyCode::KeyS),
+            left: PhysicalKey::Code(KeyCode::KeyA),
+            right: PhysicalKey::Code(KeyCode::KeyD),
+            up: PhysicalKey::Code(KeyCode::KeyE),
+            down: PhysicalKey::Code(KeyCode::KeyQ),
+            boost: PhysicalKey::Code(KeyCode::ShiftLeft),
+            slow: PhysicalKey::Code(KeyCode::ControlLeft),
         }
     }
 }
 
 impl Default for Ui {
     fn default() -> Self {
-        Self { toggle: Tab }
+        Self {
+            toggle: PhysicalKey::Code(KeyCode::Tab),
+        }
     }
 }
 
 impl Default for Sequencer {
     fn default() -> Self {
         Self {
-            add_keyframe: K,
-            play: P,
+            add_keyframe: PhysicalKey::Code(KeyCode::KeyK),
+            play: PhysicalKey::Code(KeyCode::KeyP),
         }
     }
 }
@@ -122,9 +128,9 @@ impl Default for Sequencer {
 impl Default for Rendering {
     fn default() -> Self {
         Self {
-            switch_to_reference_path_tracing: Space,
-            reset_path_tracer: Back,
-            light_enable_emissive: L,
+            switch_to_reference_path_tracing: PhysicalKey::Code(KeyCode::Space),
+            reset_path_tracer: PhysicalKey::Code(KeyCode::Backspace),
+            light_enable_emissive: PhysicalKey::Code(KeyCode::KeyL),
         }
     }
 }
@@ -132,7 +138,7 @@ impl Default for Rendering {
 impl Default for Misc {
     fn default() -> Self {
         Self {
-            print_camera_transform: C,
+            print_camera_transform: PhysicalKey::Code(KeyCode::KeyC),
         }
     }
 }

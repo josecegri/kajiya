@@ -14,10 +14,10 @@ glam = { version = "0.22", features = ["serde"] }
 log = "0.4"
 puffin = { version = "0.11.0" }
 turbosloth = { git = "https://github.com/h3r2tic/turbosloth.git", rev = "92030af" }
-winit = "0.25"
+winit = { version = "0.30.13", features = ["rwh_06"] }
 
 puffin_http = { version = "0.8.0", optional = true }
-imgui = { version = "0.7", optional = true }
+imgui = { version = "0.12.0", optional = true }
 
 [features]
 dear-imgui = [

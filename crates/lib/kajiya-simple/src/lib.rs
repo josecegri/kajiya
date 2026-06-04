@@ -17,6 +17,7 @@ pub use log;
 pub use main_loop::*;
 pub use winit::{
     self,
-    event::{ElementState, KeyboardInput, MouseButton, WindowEvent},
-    window::WindowBuilder,
+    dpi::PhysicalPosition,
+    event::{ElementState, MouseButton, WindowEvent},
+    window::WindowAttributes,
 };
