@@ -225,12 +225,13 @@ impl CreateGpuImage {
 
         let min_img_dim = if should_compress { 4 } else { 1 };
 
-        let round_up_to_block = |x: u32| -> u32 {
-            (((x + min_img_dim - 1) / min_img_dim) * min_img_dim).max(min_img_dim)
-        };
+        let round_up_to_block =
+            |x: u32| -> u32 { (x.div_ceil(min_img_dim) * min_img_dim).max(min_img_dim) };
 
         let mut process_mip = |mip: DynamicImage| -> Vec<u8> {
-            let mip = if mip.width() % min_img_dim != 0 || mip.height() % min_img_dim != 0 {
+            let mip = if !mip.width().is_multiple_of(min_img_dim)
+                || !mip.height().is_multiple_of(min_img_dim)
+            {
                 let width = round_up_to_block(mip.width());
                 let height = round_up_to_block(mip.height());
                 mip.resize_exact(width, height, FilterType::Lanczos3)
@@ -339,21 +340,21 @@ impl CreateGpuImage {
 // From `ddsfile`, with some modifications
 mod dds_util {
     pub fn get_texture_size(pitch: u32, pitch_height: u32, height: u32, depth: u32) -> usize {
-        let row_height = (height + (pitch_height - 1)) / pitch_height;
+        let row_height = height.div_ceil(pitch_height);
         pitch as usize * row_height as usize * depth as usize
     }
 
     pub fn get_pitch(dds: &ddsfile::Dds, width: u32) -> Option<u32> {
         // Try format first
-        if let Some(format) = dds.get_format() {
-            if let Some(pitch) = format.get_pitch(width) {
-                return Some(pitch);
-            }
+        if let Some(format) = dds.get_format()
+            && let Some(pitch) = format.get_pitch(width)
+        {
+            return Some(pitch);
         }
 
         // Then try to calculate it ourselves
         if let Some(bpp) = dds.get_bits_per_pixel() {
-            return Some((bpp * width + 7) / 8);
+            return Some((bpp * width).div_ceil(8));
         }
         None
     }

@@ -503,11 +503,12 @@ impl Device {
             )?;
 
             let debug_utils = if graphics_debugging {
-                Some(debug_utils::Device::new(&instance, &device))
+                Some(debug_utils::Device::new(instance, &device))
             } else {
                 None
             };
 
+            #[allow(clippy::arc_with_non_send_sync)]
             Ok(Arc::new(Device {
                 pdevice: pdevice.clone(),
                 debug_utils,
@@ -614,7 +615,7 @@ impl Device {
                             frame0.presentation_command_buffer.submit_done_fence,
                         ],
                         true,
-                        std::u64::MAX,
+                        u64::MAX,
                     )
                     .map_err(|err| self.report_error(err.into()))
                     .expect("Wait for fence failed.");

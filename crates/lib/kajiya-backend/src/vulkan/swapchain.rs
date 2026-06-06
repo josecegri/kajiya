@@ -227,12 +227,8 @@ impl Swapchain {
         let rendering_finished_semaphore = self.rendering_finished_semaphores[self.next_semaphore];
 
         let present_index = unsafe {
-            self.fns.acquire_next_image(
-                self.raw,
-                std::u64::MAX,
-                acquire_semaphore,
-                vk::Fence::null(),
-            )
+            self.fns
+                .acquire_next_image(self.raw, u64::MAX, acquire_semaphore, vk::Fence::null())
         }
         .map(|(val, _)| val as usize);
 

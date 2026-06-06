@@ -25,7 +25,7 @@ impl LazyWorker for CompileShader {
             .path
             .extension()
             .map(|s| s.to_string_lossy().to_string())
-            .unwrap_or_else(|| "".to_string());
+            .unwrap_or_default();
 
         let name = self
             .path
@@ -87,7 +87,7 @@ impl LazyWorker for CompileRayTracingShader {
             .path
             .extension()
             .map(|s| s.to_string_lossy().to_string())
-            .unwrap_or_else(|| "".to_string());
+            .unwrap_or_default();
 
         let name = self
             .path

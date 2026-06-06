@@ -311,6 +311,7 @@ impl RenderGraph {
         }
     }
 
+    #[allow(clippy::multiple_bound_locations)]
     pub fn create<Desc: ResourceDesc>(
         &mut self,
         desc: Desc,
@@ -985,10 +986,10 @@ impl<'exec_params, 'constants> ExecutingRenderGraph<'exec_params, 'constants> {
             resources: resource_registry,
         };
 
-        if let Some(render_fn) = pass.render_fn {
-            if let Err(err) = render_fn(&mut api) {
-                panic!("Pass {:?} failed to render: {:#}", pass.name, err);
-            }
+        if let Some(render_fn) = pass.render_fn
+            && let Err(err) = render_fn(&mut api)
+        {
+            panic!("Pass {:?} failed to render: {:#}", pass.name, err);
         }
 
         let params = &resource_registry.execution_params;

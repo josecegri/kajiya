@@ -263,6 +263,9 @@ where
         [c] if c.is_ascii_alphabetic() => {
             format!("Key{}", s.to_ascii_uppercase())
         }
+        [c] if c.is_ascii_digit() => {
+            format!("Digit{s}")
+        }
         _ => s,
     };
 

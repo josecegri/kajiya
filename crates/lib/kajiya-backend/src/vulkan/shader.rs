@@ -77,8 +77,8 @@ pub fn create_descriptor_set_layouts(
 
     // Find the number of sets in `descriptor_sets`
     let set_count = descriptor_sets
-        .iter()
-        .map(|(set_index, _)| *set_index + 1)
+        .keys()
+        .map(|set_index| *set_index + 1)
         .max()
         .unwrap_or(0u32);
 
@@ -112,10 +112,10 @@ pub fn create_descriptor_set_layouts(
             let mut resolved_set_opts: &DescriptorSetLayoutOpts = &_set_opts_default;
 
             for maybe_opt in set_opts.iter_mut() {
-                if let Some(opt) = maybe_opt.as_mut() {
-                    if opt.0 == set_index {
-                        resolved_set_opts = &std::mem::take(maybe_opt).unwrap().1;
-                    }
+                if let Some(opt) = maybe_opt.as_mut()
+                    && opt.0 == set_index
+                {
+                    resolved_set_opts = &std::mem::take(maybe_opt).unwrap().1;
                 }
             }
             resolved_set_opts
@@ -605,7 +605,7 @@ impl FramebufferCacheKey {
         depth_stencil_attachment: Option<&'a ImageDesc>,
     ) -> Self {
         let color_attachments = color_attachments
-            .chain(depth_stencil_attachment.into_iter())
+            .chain(depth_stencil_attachment)
             .copied()
             .map(|attachment| (attachment.usage, attachment.flags))
             .collect();

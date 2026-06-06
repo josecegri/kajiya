@@ -118,6 +118,7 @@ pub struct ExportedHandle<ResType: Resource> {
     pub(crate) marker: PhantomData<ResType>,
 }
 
+#[allow(clippy::non_canonical_clone_impl)]
 impl<ResType: Resource> Clone for ExportedHandle<ResType> {
     fn clone(&self) -> Self {
         Self {

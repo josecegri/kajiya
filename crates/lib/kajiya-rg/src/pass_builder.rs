@@ -30,6 +30,7 @@ impl<'s> Drop for PassBuilder<'s> {
 }
 
 impl<'rg> PassBuilder<'rg> {
+    #[allow(clippy::multiple_bound_locations)]
     pub fn create<Desc: ResourceDesc>(
         &mut self,
         desc: Desc,

@@ -72,7 +72,7 @@ impl Instance {
             .required_extensions
             .iter()
             .map(|ext| ext.as_ptr())
-            .chain(Self::extension_names(&builder).into_iter())
+            .chain(Self::extension_names(&builder))
             .collect::<Vec<_>>();
 
         let layer_names = Self::layer_names(&builder);

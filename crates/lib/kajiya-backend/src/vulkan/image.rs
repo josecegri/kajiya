@@ -126,7 +126,7 @@ impl ImageDesc {
 
     pub fn div_up_extent(mut self, div_extent: [u32; 3]) -> Self {
         for (extent, &div_extent) in self.extent.iter_mut().zip(&div_extent) {
-            *extent = ((*extent + div_extent - 1) / div_extent).max(1);
+            *extent = (*extent).div_ceil(div_extent).max(1);
         }
         self
     }
