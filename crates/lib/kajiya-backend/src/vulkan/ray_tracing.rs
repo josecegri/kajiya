@@ -290,7 +290,7 @@ impl Device {
             size_info
         };
 
-        log::info!(
+        log::debug!(
             "Acceleration structure size: {}, scratch size: {}",
             memory_requirements.acceleration_structure_size,
             memory_requirements.build_scratch_size

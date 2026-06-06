@@ -252,7 +252,7 @@ impl Device {
         desc: ImageDesc,
         initial_data: Vec<ImageSubResourceData>,
     ) -> Result<Image, BackendError> {
-        log::info!("Creating an image: {:?}", desc);
+        log::debug!("Creating an image: {:?}", desc);
 
         let create_info = get_image_create_info(&desc, !initial_data.is_empty());
 

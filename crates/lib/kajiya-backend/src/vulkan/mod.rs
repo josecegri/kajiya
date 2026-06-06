@@ -95,12 +95,12 @@ impl RenderBackend {
                 .unwrap()
         });
 
-        info!("Selected physical device: {:#?}", *physical_device);
+        debug!("Selected physical device: {:#?}", *physical_device);
 
         let device = device::Device::create(&physical_device, config.graphics_debugging)?;
         let surface_formats = swapchain::Swapchain::enumerate_surface_formats(&device, &surface)?;
 
-        info!("Available surface formats: {:#?}", surface_formats);
+        debug!("Available surface formats: {:#?}", surface_formats);
 
         let swapchain = swapchain::Swapchain::new(
             &device,

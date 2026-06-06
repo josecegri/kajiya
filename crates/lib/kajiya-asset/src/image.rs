@@ -86,7 +86,7 @@ impl LazyWorker for LoadImage {
         } else {
             let image = image::load_from_memory(&bytes)?;
             let image_dimensions = image.dimensions();
-            log::info!("Loaded image: {:?} {:?}", image_dimensions, image.color());
+            log::debug!("Loaded image: {:?} {:?}", image_dimensions, image.color());
 
             let image = image.to_rgba8();
 
