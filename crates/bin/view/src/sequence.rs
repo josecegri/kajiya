@@ -30,11 +30,7 @@ impl<T> MemOption<T> {
     where
         T: Copy,
     {
-        if self.is_some {
-            self.item
-        } else {
-            other
-        }
+        if self.is_some { self.item } else { other }
     }
 }
 

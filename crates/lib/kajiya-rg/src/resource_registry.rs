@@ -1,10 +1,11 @@
 use crate::{GraphResourceInfo, RenderGraphPipelines};
 
 use super::{
-    graph::RenderGraphExecutionParams, resource::*, RgComputePipelineHandle,
-    RgRasterPipelineHandle, RgRtPipelineHandle,
+    RgComputePipelineHandle, RgRasterPipelineHandle, RgRtPipelineHandle,
+    graph::RenderGraphExecutionParams, resource::*,
 };
 use kajiya_backend::{
+    BackendError,
     ash::vk,
     dynamic_constants::DynamicConstants,
     vk_sync,
@@ -12,7 +13,6 @@ use kajiya_backend::{
         ray_tracing::{RayTracingAcceleration, RayTracingPipeline},
         shader::{ComputePipeline, RasterPipeline},
     },
-    BackendError,
 };
 use std::sync::Arc;
 
@@ -33,7 +33,7 @@ pub enum AnyRenderResource {
 
 impl AnyRenderResource {
     #[track_caller]
-    pub fn borrow(&self) -> AnyRenderResourceRef {
+    pub fn borrow(&self) -> AnyRenderResourceRef<'_> {
         match self {
             AnyRenderResource::OwnedImage(inner) => AnyRenderResourceRef::Image(inner),
             AnyRenderResource::ImportedImage(inner) => AnyRenderResourceRef::Image(inner.as_ref()),
@@ -74,6 +74,7 @@ impl<'exec_params, 'constants> ResourceRegistry<'exec_params, 'constants> {
         self.image_from_raw_handle::<ViewType>(resource.handle)
     }
 
+    #[allow(clippy::extra_unused_type_parameters)]
     pub(crate) fn image_from_raw_handle<ViewType: GpuViewType>(
         &self,
         handle: GraphRawResourceHandle,
@@ -88,6 +89,7 @@ impl<'exec_params, 'constants> ResourceRegistry<'exec_params, 'constants> {
         self.buffer_from_raw_handle::<ViewType>(resource.handle)
     }
 
+    #[allow(clippy::extra_unused_type_parameters)]
     pub(crate) fn buffer_from_raw_handle<ViewType: GpuViewType>(
         &self,
         handle: GraphRawResourceHandle,
@@ -105,6 +107,7 @@ impl<'exec_params, 'constants> ResourceRegistry<'exec_params, 'constants> {
         self.rt_acceleration_from_raw_handle::<ViewType>(resource.handle)
     }
 
+    #[allow(clippy::extra_unused_type_parameters)]
     pub(crate) fn rt_acceleration_from_raw_handle<ViewType: GpuViewType>(
         &self,
         handle: GraphRawResourceHandle,
@@ -123,8 +126,6 @@ impl<'exec_params, 'constants> ResourceRegistry<'exec_params, 'constants> {
     where
         's: 'a,
     {
-        let view_desc = view_desc;
-
         let image = match &self.resources[resource.id as usize].resource.borrow() {
             AnyRenderResourceRef::Image(img) => *img,
             _ => panic!(),

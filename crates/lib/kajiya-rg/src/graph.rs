@@ -3,19 +3,17 @@
 use crate::{renderer::FrameConstantsLayout, resource_registry::PendingRenderResourceInfo};
 
 use super::{
+    RenderPassApi,
     pass_builder::PassBuilder,
     resource::*,
     resource_registry::{
         AnyRenderResource, AnyRenderResourceRef, RegistryResource, ResourceRegistry,
     },
-    RenderPassApi,
 };
 
 use kajiya_backend::{
-    ash::{
-        extensions::khr::Swapchain,
-        vk::{self, DebugUtilsLabelEXT},
-    },
+    BackendError,
+    ash::vk::{self, DebugUtilsLabelEXT},
     dynamic_constants::DynamicConstants,
     pipeline_cache::{
         ComputePipelineHandle, PipelineCache, RasterPipelineHandle, RtPipelineHandle,
@@ -25,19 +23,18 @@ use kajiya_backend::{
     vk_sync,
     vulkan::{
         barrier::{
-            get_access_info, image_aspect_mask_from_access_type_and_format, record_image_barrier,
-            ImageBarrier,
+            ImageBarrier, get_access_info, image_aspect_mask_from_access_type_and_format,
+            record_image_barrier,
         },
         device::{CommandBuffer, Device, VkProfilerData},
         image::ImageViewDesc,
         ray_tracing::{RayTracingAcceleration, RayTracingPipelineDesc},
         shader::{ComputePipelineDesc, PipelineShader, PipelineShaderDesc, RasterPipelineDesc},
     },
-    BackendError,
 };
 use parking_lot::Mutex;
 use std::{
-    collections::{HashMap, VecDeque},
+    collections::{BTreeMap, HashMap, VecDeque},
     ffi::CString,
     hash::Hash,
     marker::PhantomData,
@@ -117,7 +114,7 @@ pub(crate) struct RgRtPipeline {
 }
 
 pub struct PredefinedDescriptorSet {
-    pub bindings: HashMap<u32, rspirv_reflect::DescriptorInfo>,
+    pub bindings: BTreeMap<u32, rspirv_reflect::DescriptorInfo>,
 }
 
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -314,6 +311,7 @@ impl RenderGraph {
         }
     }
 
+    #[allow(clippy::multiple_bound_locations)]
     pub fn create<Desc: ResourceDesc>(
         &mut self,
         desc: Desc,
@@ -510,7 +508,9 @@ impl RenderGraph {
                         desc: GraphResourceDesc::RayTracingAcceleration(_),
                         ..
                     }) => {
-                        unimplemented!("Creation of acceleration structures via the render graph is not currently supported");
+                        unimplemented!(
+                            "Creation of acceleration structures via the render graph is not currently supported"
+                        );
                     }
                     GraphResourceInfo::Imported(
                         GraphResourceImportInfo::RayTracingAcceleration { .. },
@@ -929,10 +929,10 @@ impl<'exec_params, 'constants> ExecutingRenderGraph<'exec_params, 'constants> {
             .device
             .record_crash_marker(cb, format!("begin render pass {:?}", pass.name));
 
-        if let Some(debug_utils) = params.device.debug_utils() {
+        if let Some(debug_utils) = params.device.debug_utils_device() {
             unsafe {
                 let label: CString = CString::new(pass.name.as_str()).unwrap();
-                let label = DebugUtilsLabelEXT::builder().label_name(&label).build();
+                let label = DebugUtilsLabelEXT::default().label_name(&label);
                 debug_utils.cmd_begin_debug_utils_label(cb.raw, &label);
             }
         }
@@ -986,10 +986,10 @@ impl<'exec_params, 'constants> ExecutingRenderGraph<'exec_params, 'constants> {
             resources: resource_registry,
         };
 
-        if let Some(render_fn) = pass.render_fn {
-            if let Err(err) = render_fn(&mut api) {
-                panic!("Pass {:?} failed to render: {:#}", pass.name, err);
-            }
+        if let Some(render_fn) = pass.render_fn
+            && let Err(err) = render_fn(&mut api)
+        {
+            panic!("Pass {:?} failed to render: {:#}", pass.name, err);
         }
 
         let params = &resource_registry.execution_params;
@@ -998,7 +998,7 @@ impl<'exec_params, 'constants> ExecutingRenderGraph<'exec_params, 'constants> {
             .profiler_data
             .end_scope(&params.device.raw, cb.raw, vk_scope);
 
-        if let Some(debug_utils) = params.device.debug_utils() {
+        if let Some(debug_utils) = params.device.debug_utils_device() {
             unsafe {
                 debug_utils.cmd_end_debug_utils_label(cb.raw);
             }
@@ -1152,8 +1152,10 @@ impl RetiredRenderGraph {
                 }
                 AnyRenderResource::ImportedImage(_)
                 | AnyRenderResource::ImportedBuffer(_)
-                | AnyRenderResource::ImportedRayTracingAcceleration(_) => {},
-                AnyRenderResource::Pending { .. } => panic!("RetiredRenderGraph::release_resources called while a resource was in Pending state"),
+                | AnyRenderResource::ImportedRayTracingAcceleration(_) => {}
+                AnyRenderResource::Pending { .. } => panic!(
+                    "RetiredRenderGraph::release_resources called while a resource was in Pending state"
+                ),
             }
         }
     }

@@ -1,4 +1,4 @@
-use kajiya_backend::{ash::vk, vulkan, BackendError};
+use kajiya_backend::{BackendError, ash::vk, vulkan};
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 use std::ops::Range;
@@ -17,10 +17,7 @@ struct PendingBufferUpload {
 impl<T: Copy> BufferDataSource for &'static [T] {
     fn as_bytes(&self) -> &[u8] {
         unsafe {
-            std::slice::from_raw_parts(
-                self.as_ptr() as *const u8,
-                self.len() * std::mem::size_of::<T>(),
-            )
+            std::slice::from_raw_parts(self.as_ptr() as *const u8, std::mem::size_of_val(*self))
         }
     }
 
@@ -113,6 +110,7 @@ impl BufferBuilder {
         }
 
         // TODO: merge chunks to perform fewer uploads if multiple source regions fit in one chunk
+        #[allow(clippy::manual_div_ceil)]
         let chunks: Vec<UploadChunk> = self
             .pending_uploads
             .iter()
@@ -142,11 +140,10 @@ impl BufferBuilder {
                     cb,
                     staging_buffer.raw,
                     target,
-                    &[vk::BufferCopy::builder()
+                    &[vk::BufferCopy::default()
                         .src_offset(0u64)
                         .dst_offset(target_offset + pending.offset + src_range.start as u64)
-                        .size((src_range.end - src_range.start) as u64)
-                        .build()],
+                        .size((src_range.end - src_range.start) as u64)],
                 );
             })?;
         }

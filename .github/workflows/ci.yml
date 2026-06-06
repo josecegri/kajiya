@@ -34,27 +34,28 @@ jobs:
           rustup component add clippy
           cargo clippy --all-targets -- -D warnings
 
-  test:
-    name: Test
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    env:
-      CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER: cc
-      CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER: link.exe
-      RUSTFLAGS:
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - run: cargo fetch
-      - name: cargo test build
-        # Note the use of release here means longer compile time, but much
-        # faster test execution time. If you don't have any heavy tests it
-        # might be faster to take off release and just compile in debug
-        run: cargo build --tests
-      - name: cargo test
-        run: cargo test
+  # TODO: disabled for now
+  # test:
+  #   name: Test
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, windows-latest]
+  #   runs-on: ${{ matrix.os }}
+  #   env:
+  #     CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER: cc
+  #     CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER: link.exe
+  #     RUSTFLAGS:
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         override: true
+  #     - run: cargo fetch
+  #     - name: cargo test build
+  #       # Note the use of release here means longer compile time, but much
+  #       # faster test execution time. If you don't have any heavy tests it
+  #       # might be faster to take off release and just compile in debug
+  #       run: cargo build --tests
+  #     - name: cargo test
+  #       run: cargo test

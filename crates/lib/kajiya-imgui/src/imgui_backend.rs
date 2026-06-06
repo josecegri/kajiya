@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use kajiya::{
     backend::{
-        ash::{self, vk},
         Device, Image, ImageDesc, ImageViewDesc,
+        ash::{self, vk},
     },
     ui_renderer::UiRenderer,
 };
@@ -37,7 +37,7 @@ impl ImGuiBackend {
     ) -> Self {
         setup_imgui_style(imgui);
 
-        let mut imgui_platform = WinitPlatform::init(imgui);
+        let mut imgui_platform = WinitPlatform::new(imgui);
         imgui_platform.attach_window(imgui.io_mut(), window, HiDpiMode::Locked(1.0));
 
         {
@@ -73,6 +73,7 @@ impl ImGuiBackend {
             )
         };
 
+        #[allow(clippy::arc_with_non_send_sync)]
         Self {
             device,
             imgui_platform,
@@ -115,36 +116,36 @@ impl ImGuiBackend {
         &mut self,
         window: &winit::window::Window,
         imgui: &mut imgui::Context,
-        event: &winit::event::Event<'_, ()>,
+        event: &winit::event::Event<()>,
     ) {
         self.imgui_platform
             .handle_event(imgui.io_mut(), window, event);
     }
 
-    pub fn prepare_frame<'a>(
+    pub fn prepare_frame<'imgui>(
         &mut self,
         window: &winit::window::Window,
-        imgui: &'a mut imgui::Context,
+        imgui: &'imgui mut imgui::Context,
         dt: f32,
-    ) -> imgui::Ui<'a> {
+    ) -> &'imgui mut imgui::Ui {
         self.imgui_platform
             .prepare_frame(imgui.io_mut(), window)
             .expect("Failed to prepare frame");
         imgui.io_mut().delta_time = dt;
-        imgui.frame()
+        let ui = imgui.new_frame();
+        self.imgui_platform.prepare_render(ui, window);
+        ui
     }
 
     pub fn finish_frame(
         &mut self,
-        ui: imgui::Ui<'_>,
+        imgui: &mut imgui::Context,
         window: &winit::window::Window,
         ui_renderer: &mut UiRenderer,
     ) {
         let (ui_draw_data, ui_target_image) = {
-            self.imgui_platform.prepare_render(&ui, window);
-
             let ui_draw_data: &'static imgui::DrawData =
-                unsafe { std::mem::transmute(ui.render()) };
+                unsafe { std::mem::transmute(imgui.render()) };
 
             (ui_draw_data, self.inner.lock().get_target_image().unwrap())
         };
@@ -223,7 +224,7 @@ impl ImGuiBackendInner {
                         },
                     }];
 
-                    let render_pass_begin_info = vk::RenderPassBeginInfo::builder()
+                    let render_pass_begin_info = vk::RenderPassBeginInfo::default()
                         .render_pass(gfx.imgui_render_pass)
                         .framebuffer(gfx.imgui_framebuffer)
                         .render_area(vk::Rect2D {
@@ -290,12 +291,11 @@ fn create_imgui_render_pass(device: &ash::Device) -> vk::RenderPass {
         ..Default::default()
     }];
 
-    let subpasses = [vk::SubpassDescription::builder()
+    let subpasses = [vk::SubpassDescription::default()
         .color_attachments(&color_attachment_refs)
-        .pipeline_bind_point(vk::PipelineBindPoint::GRAPHICS)
-        .build()];
+        .pipeline_bind_point(vk::PipelineBindPoint::GRAPHICS)];
 
-    let renderpass_create_info = vk::RenderPassCreateInfo::builder()
+    let renderpass_create_info = vk::RenderPassCreateInfo::default()
         .attachments(&renderpass_attachments)
         .subpasses(&subpasses)
         .dependencies(&dependencies);
@@ -323,7 +323,7 @@ fn create_imgui_framebuffer(
         .unwrap();
 
     let framebuffer_attachments = [tex.view(device, &ImageViewDesc::default()).unwrap()];
-    let frame_buffer_create_info = vk::FramebufferCreateInfo::builder()
+    let frame_buffer_create_info = vk::FramebufferCreateInfo::default()
         .render_pass(render_pass)
         .attachments(&framebuffer_attachments)
         .width(surface_resolution[0] as _)

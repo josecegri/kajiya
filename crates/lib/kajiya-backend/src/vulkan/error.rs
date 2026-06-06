@@ -69,8 +69,11 @@ impl Device {
                     )
                 }
                 _ => {
-                    format!("The GPU device has been lost. This is usually due to an infinite loop in a shader.\n\
-                    The last crash marker was: {}. The problem most likely exists directly after.", last_marker)
+                    format!(
+                        "The GPU device has been lost. This is usually due to an infinite loop in a shader.\n\
+                    The last crash marker was: {}. The problem most likely exists directly after.",
+                        last_marker
+                    )
                 }
             };
 

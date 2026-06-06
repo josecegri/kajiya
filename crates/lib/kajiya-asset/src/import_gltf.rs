@@ -1,7 +1,7 @@
 // Based on `import.rs` in the `gltf` crate, but modified not to load images (we do that separately).
 
 use bytes::Bytes;
-use gltf::{buffer, image, Document, Error, Gltf, Result};
+use gltf::{Document, Error, Gltf, Result, buffer, image};
 use std::{fs, io, path::Path};
 
 use crate::image::ImageSource;

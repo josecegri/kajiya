@@ -2,7 +2,7 @@ use async_channel::unbounded;
 use async_executor::Executor;
 use easy_parallel::Parallel;
 use glam::Quat;
-use kajiya_asset::mesh::{pack_triangle_mesh, GpuImage, LoadGltfScene, PackedTriMesh};
+use kajiya_asset::mesh::{GpuImage, LoadGltfScene, PackedTriMesh, pack_triangle_mesh};
 use smol::future;
 use std::{collections::HashSet, fs::File, path::PathBuf};
 

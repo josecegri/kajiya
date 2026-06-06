@@ -1,0 +1,28 @@
+[
+  {
+    "label": "view",
+    "build": {
+      "command": "cargo",
+      "args": ["build"],
+    },
+    "adapter": "CodeLLDB",
+    "sourceLanguages": ["rust"],
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/target/debug/view.exe",
+    "args": ["--width", "1600", "--height", "900"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+  },
+  {
+    "label": "hello",
+    "build": {
+      "command": "cargo",
+      "args": ["build"],
+    },
+    "adapter": "CodeLLDB",
+    "sourceLanguages": ["rust"],
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/target/debug/hello.exe",
+    "args": ["--width", "1600", "--height", "900"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+  },
+]

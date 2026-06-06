@@ -2,7 +2,7 @@ use crate::{
     rust_shader_compiler::CompileRustShader,
     shader_compiler::{CompileShader, CompiledShader},
     vulkan::{
-        ray_tracing::{create_ray_tracing_pipeline, RayTracingPipeline, RayTracingPipelineDesc},
+        ray_tracing::{RayTracingPipeline, RayTracingPipelineDesc, create_ray_tracing_pipeline},
         shader::*,
     },
 };
@@ -254,37 +254,43 @@ impl PipelineCache {
         device: &Arc<crate::vulkan::device::Device>,
     ) -> anyhow::Result<()> {
         // Prepare build tasks for compute
-        let compute = self.compute_entries.iter().filter_map(|(&handle, entry)| {
-            entry.pipeline.is_none().then(|| {
+        let compute = self
+            .compute_entries
+            .iter()
+            .filter(|&(&_handle, entry)| entry.pipeline.is_none())
+            .map(|(&handle, entry)| {
                 let task = entry.lazy_handle.eval(&self.lazy_cache);
                 smol::spawn(async move {
                     task.await
                         .map(|compiled| CompileTaskOutput::Compute { handle, compiled })
                 })
-            })
-        });
+            });
 
         // Prepare build tasks for raster
-        let raster = self.raster_entries.iter().filter_map(|(&handle, entry)| {
-            entry.pipeline.is_none().then(|| {
+        let raster = self
+            .raster_entries
+            .iter()
+            .filter(|&(&_handle, entry)| entry.pipeline.is_none())
+            .map(|(&handle, entry)| {
                 let task = entry.lazy_handle.eval(&self.lazy_cache);
                 smol::spawn(async move {
                     task.await
                         .map(|compiled| CompileTaskOutput::Raster { handle, compiled })
                 })
-            })
-        });
+            });
 
         // Prepare build tasks for rt
-        let rt = self.rt_entries.iter().filter_map(|(&handle, entry)| {
-            entry.pipeline.is_none().then(|| {
+        let rt = self
+            .rt_entries
+            .iter()
+            .filter(|&(&_handle, entry)| entry.pipeline.is_none())
+            .map(|(&handle, entry)| {
                 let task = entry.lazy_handle.eval(&self.lazy_cache);
                 smol::spawn(async move {
                     task.await
                         .map(|compiled| CompileTaskOutput::Rt { handle, compiled })
                 })
-            })
-        });
+            });
 
         // Gather all the build tasks together
         let shader_tasks: Vec<_> = compute.chain(raster).chain(rt).collect();

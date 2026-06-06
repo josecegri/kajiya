@@ -3,20 +3,20 @@ use std::{mem::size_of, sync::Arc};
 
 use glam::{IVec3, Vec3};
 use kajiya_backend::{
+    Device,
     ash::vk,
     vulkan::{
         buffer::{Buffer, BufferDesc},
         image::*,
         ray_tracing::RayTracingAcceleration,
         shader::{
-            create_render_pass, RenderPass, RenderPassAttachmentDesc, RenderPassDesc, ShaderSource,
+            RenderPass, RenderPassAttachmentDesc, RenderPassDesc, ShaderSource, create_render_pass,
         },
     },
-    Device,
 };
 use kajiya_rg::{self as rg, GetOrCreateTemporal, SimpleRenderPass};
 use rg::BindMutToSimpleRenderPass;
-use rust_shaders_shared::frame_constants::{IrcacheCascadeConstants, IRCACHE_CASCADE_COUNT};
+use rust_shaders_shared::frame_constants::{IRCACHE_CASCADE_COUNT, IrcacheCascadeConstants};
 use vk::BufferUsageFlags;
 
 use crate::renderers::prefix_scan::inclusive_prefix_scan_u32_1m;

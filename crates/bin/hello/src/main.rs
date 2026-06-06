@@ -2,8 +2,9 @@ use kajiya::world_renderer::AddMeshOptions;
 use kajiya_simple::*;
 
 fn main() -> anyhow::Result<()> {
-    let mut kajiya = SimpleMainLoop::builder().resolution([1920, 1080]).build(
-        WindowBuilder::new()
+    let mut kajiya = SimpleMainLoop::builder().resolution([1600, 900]).build(
+        WindowAttributes::default()
+            .with_position(PhysicalPosition::new(50, 50))
             .with_title("hello-kajiya")
             .with_resizable(false),
     )?;
@@ -20,7 +21,7 @@ fn main() -> anyhow::Result<()> {
 
     let car_mesh = kajiya
         .world_renderer
-        .add_baked_mesh("/cache/336_lrm.mesh", AddMeshOptions::new())?;
+        .add_baked_mesh("/cache/f8044ed9f35d18a0.mesh", AddMeshOptions::new())?;
 
     let car_inst = kajiya.world_renderer.add_instance(
         car_mesh,

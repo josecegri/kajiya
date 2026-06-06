@@ -70,10 +70,10 @@ impl DynamicConstants {
         let t_align = align_of::<T>();
 
         assert!(self.frame_offset_bytes + t_size < DYNAMIC_CONSTANTS_SIZE_BYTES);
-        assert!(DYNAMIC_CONSTANTS_ALIGNMENT % t_align == 0);
+        assert!(DYNAMIC_CONSTANTS_ALIGNMENT.is_multiple_of(t_align));
 
         let buffer_offset = self.current_offset() as usize;
-        assert!(buffer_offset % t_align == 0);
+        assert!(buffer_offset.is_multiple_of(t_align));
 
         let mut dst_offset = buffer_offset;
         for t in iter {

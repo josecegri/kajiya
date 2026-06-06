@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
 use bytes::Bytes;
-use image::{imageops::FilterType, DynamicImage, GenericImageView as _, ImageBuffer, Rgba};
+use image::{DynamicImage, GenericImageView as _, ImageBuffer, Rgba, imageops::FilterType};
 use intel_tex_2::{bc5, bc7};
-use kajiya_backend::{ash::vk, file::LoadFile, ImageDesc};
+use kajiya_backend::{ImageDesc, ash::vk, file::LoadFile};
 use turbosloth::*;
 
 use crate::mesh::TexCompressionMode;
@@ -86,7 +86,7 @@ impl LazyWorker for LoadImage {
         } else {
             let image = image::load_from_memory(&bytes)?;
             let image_dimensions = image.dimensions();
-            log::info!("Loaded image: {:?} {:?}", image_dimensions, image.color());
+            log::debug!("Loaded image: {:?} {:?}", image_dimensions, image.color());
 
             let image = image.to_rgba8();
 
@@ -225,12 +225,15 @@ impl CreateGpuImage {
 
         let min_img_dim = if should_compress { 4 } else { 1 };
 
+        #[allow(clippy::manual_div_ceil)]
         let round_up_to_block = |x: u32| -> u32 {
             (((x + min_img_dim - 1) / min_img_dim) * min_img_dim).max(min_img_dim)
         };
 
         let mut process_mip = |mip: DynamicImage| -> Vec<u8> {
-            let mip = if mip.width() % min_img_dim != 0 || mip.height() % min_img_dim != 0 {
+            let mip = if !mip.width().is_multiple_of(min_img_dim)
+                || !mip.height().is_multiple_of(min_img_dim)
+            {
                 let width = round_up_to_block(mip.width());
                 let height = round_up_to_block(mip.height());
                 mip.resize_exact(width, height, FilterType::Lanczos3)
@@ -339,20 +342,22 @@ impl CreateGpuImage {
 // From `ddsfile`, with some modifications
 mod dds_util {
     pub fn get_texture_size(pitch: u32, pitch_height: u32, height: u32, depth: u32) -> usize {
+        #[allow(clippy::manual_div_ceil)]
         let row_height = (height + (pitch_height - 1)) / pitch_height;
         pitch as usize * row_height as usize * depth as usize
     }
 
     pub fn get_pitch(dds: &ddsfile::Dds, width: u32) -> Option<u32> {
         // Try format first
-        if let Some(format) = dds.get_format() {
-            if let Some(pitch) = format.get_pitch(width) {
-                return Some(pitch);
-            }
+        if let Some(format) = dds.get_format()
+            && let Some(pitch) = format.get_pitch(width)
+        {
+            return Some(pitch);
         }
 
         // Then try to calculate it ourselves
         if let Some(bpp) = dds.get_bits_per_pixel() {
+            #[allow(clippy::manual_div_ceil)]
             return Some((bpp * width + 7) / 8);
         }
         None

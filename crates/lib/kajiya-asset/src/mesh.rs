@@ -449,6 +449,7 @@ pub struct PackedVertex {
     normal: u32,
 }
 
+#[allow(clippy::manual_clamp)]
 fn pack_unit_direction_11_10_11(x: f32, y: f32, z: f32) -> u32 {
     let x = ((x.max(-1.0).min(1.0) * 0.5 + 0.5) * ((1u32 << 11u32) - 1u32) as f32) as u32;
     let y = ((y.max(-1.0).min(1.0) * 0.5 + 0.5) * ((1u32 << 10u32) - 1u32) as f32) as u32;
@@ -458,6 +459,7 @@ fn pack_unit_direction_11_10_11(x: f32, y: f32, z: f32) -> u32 {
 }
 
 #[repr(packed)]
+#[allow(clippy::repr_packed_without_abi)]
 pub struct FlatVec<T> {
     len: u64,
     offset: u64,
@@ -495,8 +497,7 @@ impl<T> FlatVec<T> {
     #[inline(always)]
     pub fn as_slice(&self) -> &[T] {
         unsafe {
-            let data = (std::ptr::addr_of!(self.offset) as *const u64 as *const u8)
-                .add(self.offset as usize);
+            let data = (std::ptr::addr_of!(self.offset) as *const u8).add(self.offset as usize);
             std::slice::from_raw_parts(data as *const T, self.len as usize)
         }
     }
@@ -504,8 +505,7 @@ impl<T> FlatVec<T> {
     #[inline(always)]
     pub fn as_ptr(&self) -> *const T {
         unsafe {
-            let data = (std::ptr::addr_of!(self.offset) as *const u64 as *const u8)
-                .add(self.offset as usize);
+            let data = (std::ptr::addr_of!(self.offset) as *const u8).add(self.offset as usize);
             data as *const T
         }
     }
@@ -717,6 +717,7 @@ macro_rules! def_asset {
             }
 
             #[repr(packed)]
+            #[allow(clippy::repr_packed_without_abi)]
             pub struct Flat {
                 $(
                     pub $name: def_asset!(@flat_ty $($type)+ ),
@@ -752,6 +753,7 @@ impl<T> AssetRef<T> {
         self.identity
     }
 }
+#[allow(clippy::non_canonical_clone_impl)]
 impl<T> Clone for AssetRef<T> {
     fn clone(&self) -> Self {
         Self {
@@ -772,6 +774,7 @@ impl<T> Hash for AssetRef<T> {
         state.write_u64(self.identity)
     }
 }
+#[allow(clippy::non_canonical_partial_ord_impl)]
 impl<T> PartialOrd for AssetRef<T> {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         self.identity.partial_cmp(&other.identity)

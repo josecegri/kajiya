@@ -10,17 +10,17 @@ use kajiya::{
 use kajiya_simple::*;
 
 use crate::{
+    PersistedState,
     opt::Opt,
     persisted::{MeshSource, SceneElement, SceneElementTransform, ShouldResetPathTracer as _},
     scene::SceneDesc,
     sequence::{CameraPlaybackSequence, MemOption, SequenceValue},
-    PersistedState,
 };
 
 use crate::keymap::KeymapConfig;
 use log::{info, warn};
 use std::{
-    collections::{hash_map::DefaultHasher, HashMap},
+    collections::{HashMap, hash_map::DefaultHasher},
     fs::File,
     hash::{Hash, Hasher},
     path::PathBuf,
@@ -128,10 +128,10 @@ impl RuntimeState {
         });
 
         // Load the IBL too
-        if let Some(ibl) = persisted.scene.ibl.as_ref() {
-            if world_renderer.ibl.load_image(ibl).is_err() {
-                persisted.scene.ibl = None;
-            }
+        if let Some(ibl) = persisted.scene.ibl.as_ref()
+            && world_renderer.ibl.load_image(ibl).is_err()
+        {
+            persisted.scene.ibl = None;
         }
 
         res
@@ -201,14 +201,18 @@ impl RuntimeState {
 
         // When starting camera rotation, hide the mouse cursor, and capture it to the window.
         if (self.mouse.buttons_pressed & (1 << 2)) != 0 {
-            let _ = ctx.window.set_cursor_grab(true);
+            let _ = ctx
+                .window
+                .set_cursor_grab(winit::window::CursorGrabMode::Confined);
             self.grab_cursor_pos = self.mouse.physical_position;
             ctx.window.set_cursor_visible(false);
         }
 
         // When ending camera rotation, release the cursor.
         if (self.mouse.buttons_released & (1 << 2)) != 0 {
-            let _ = ctx.window.set_cursor_grab(false);
+            let _ = ctx
+                .window
+                .set_cursor_grab(winit::window::CursorGrabMode::None);
             ctx.window.set_cursor_visible(true);
         }
 
@@ -324,7 +328,7 @@ impl RuntimeState {
         let sun_interp_t = if ctx.world_renderer.render_mode == RenderMode::Reference {
             1.0
         } else {
-            (-1.0 * persisted.movement.sun_rotation_smoothness).exp2()
+            (-persisted.movement.sun_rotation_smoothness).exp2()
         };
 
         self.sun_direction_interp =
@@ -623,7 +627,7 @@ impl RuntimeState {
                 let cached_mesh_name = format!("{:8.8x}", path_hash);
                 let cached_mesh_path = PathBuf::from(format!("/cache/{}.mesh", cached_mesh_name));
 
-                if !canonical_path_from_vfs(&cached_mesh_path).map_or(false, |path| path.exists()) {
+                if !canonical_path_from_vfs(&cached_mesh_path).is_ok_and(|path| path.exists()) {
                     kajiya_asset_pipe::process_mesh_asset(
                         kajiya_asset_pipe::MeshAssetProcessParams {
                             path: path.clone(),
