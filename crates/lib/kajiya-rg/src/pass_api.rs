@@ -415,11 +415,12 @@ impl<'api, 'a, 'exec_params, 'constants> BoundComputePipeline<'api, 'a, 'exec_pa
         let group_size = self.pipeline.group_size;
 
         unsafe {
+            #[allow(clippy::manual_div_ceil)]
             self.api.device().raw.cmd_dispatch(
                 self.api.cb.raw,
-                threads[0].div_ceil(group_size[0]),
-                threads[1].div_ceil(group_size[1]),
-                threads[2].div_ceil(group_size[2]),
+                (threads[0] + group_size[0] - 1) / group_size[0],
+                (threads[1] + group_size[1] - 1) / group_size[1],
+                (threads[2] + group_size[2] - 1) / group_size[2],
             );
         }
     }

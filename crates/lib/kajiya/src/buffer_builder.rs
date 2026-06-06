@@ -110,13 +110,14 @@ impl BufferBuilder {
         }
 
         // TODO: merge chunks to perform fewer uploads if multiple source regions fit in one chunk
+        #[allow(clippy::manual_div_ceil)]
         let chunks: Vec<UploadChunk> = self
             .pending_uploads
             .iter()
             .enumerate()
             .flat_map(|(pending_idx, pending)| {
                 let byte_count = pending.source.as_bytes().len();
-                let chunk_count = byte_count.div_ceil(STAGING_BYTES);
+                let chunk_count = (byte_count + STAGING_BYTES - 1) / STAGING_BYTES;
                 (0..chunk_count).map(move |chunk| UploadChunk {
                     pending_idx,
                     src_range: chunk * STAGING_BYTES..((chunk + 1) * STAGING_BYTES).min(byte_count),

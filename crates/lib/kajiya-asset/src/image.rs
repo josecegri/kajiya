@@ -225,8 +225,10 @@ impl CreateGpuImage {
 
         let min_img_dim = if should_compress { 4 } else { 1 };
 
-        let round_up_to_block =
-            |x: u32| -> u32 { (x.div_ceil(min_img_dim) * min_img_dim).max(min_img_dim) };
+        #[allow(clippy::manual_div_ceil)]
+        let round_up_to_block = |x: u32| -> u32 {
+            (((x + min_img_dim - 1) / min_img_dim) * min_img_dim).max(min_img_dim)
+        };
 
         let mut process_mip = |mip: DynamicImage| -> Vec<u8> {
             let mip = if !mip.width().is_multiple_of(min_img_dim)
@@ -340,7 +342,8 @@ impl CreateGpuImage {
 // From `ddsfile`, with some modifications
 mod dds_util {
     pub fn get_texture_size(pitch: u32, pitch_height: u32, height: u32, depth: u32) -> usize {
-        let row_height = height.div_ceil(pitch_height);
+        #[allow(clippy::manual_div_ceil)]
+        let row_height = (height + (pitch_height - 1)) / pitch_height;
         pitch as usize * row_height as usize * depth as usize
     }
 
@@ -354,7 +357,8 @@ mod dds_util {
 
         // Then try to calculate it ourselves
         if let Some(bpp) = dds.get_bits_per_pixel() {
-            return Some((bpp * width).div_ceil(8));
+            #[allow(clippy::manual_div_ceil)]
+            return Some((bpp * width + 7) / 8);
         }
         None
     }
