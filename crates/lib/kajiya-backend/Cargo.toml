@@ -18,7 +18,7 @@ futures = "0.3"
 glam = "0.22"
 gpu-allocator = "0.28.0"
 gpu-profiler = { git = "https://github.com/h3r2tic/gpu-profiler.git", rev = "1ad89f9f2ddcd34e4a5f37bc85233adfe7baad56", features = ["use-ash"] }
-hassle-rs = "0.10"
+hassle-rs = "0.12.0"
 hotwatch = "0.4"
 log = "0.4"
 nanoserde = "0.2.1"
