@@ -3,7 +3,7 @@ use kajiya_simple::{
     KeyMap, KeyboardMap,
     winit::keyboard::{KeyCode, PhysicalKey},
 };
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::{
     fs::{File, canonicalize},
     io::Read,
@@ -11,7 +11,7 @@ use std::{
 };
 use toml::from_str;
 
-#[derive(Serialize, Deserialize, Default, Clone)]
+#[derive(Default, Clone)]
 pub struct KeymapConfig {
     pub movement: Movement,
     pub ui: Ui,
@@ -35,12 +35,10 @@ impl KeymapConfig {
             .read_to_string(&mut buffer)
             .with_context(|| "Failed to read keymap.toml")?;
 
-        // TODO restore keymap.toml file parsing
         // Don't use anyhow context here because it doesn't show the parsing error.
-        let keymap = from_str(&buffer)
+        let keymap: KeymapConfigToml = from_str(&buffer)
             .map_err(|e| anyhow!("Failed to parse keymap.toml: {}", e.to_string()))?;
-
-        Ok(keymap)
+        Ok(keymap.into())
     }
 }
 
@@ -58,7 +56,7 @@ impl From<Movement> for KeyboardMap {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Clone)]
 pub struct Movement {
     forward: PhysicalKey,
     backward: PhysicalKey,
@@ -70,25 +68,25 @@ pub struct Movement {
     slow: PhysicalKey,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Clone)]
 pub struct Ui {
     pub toggle: PhysicalKey,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Clone)]
 pub struct Sequencer {
     pub add_keyframe: PhysicalKey,
     pub play: PhysicalKey,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Clone)]
 pub struct Rendering {
     pub switch_to_reference_path_tracing: PhysicalKey,
     pub reset_path_tracer: PhysicalKey,
     pub light_enable_emissive: PhysicalKey,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Clone)]
 pub struct Misc {
     pub print_camera_transform: PhysicalKey,
 }
@@ -141,4 +139,134 @@ impl Default for Misc {
             print_camera_transform: PhysicalKey::Code(KeyCode::KeyC),
         }
     }
+}
+
+// keymap deserialization plumbing
+
+#[derive(Deserialize, Clone)]
+struct KeymapConfigToml {
+    movement: MovementConfigToml,
+    ui: UiConfigToml,
+    sequencer: SequencerConfigToml,
+    rendering: RenderingConfigToml,
+    misc: MiscConfigToml,
+}
+
+#[derive(Deserialize, Clone)]
+struct MovementConfigToml {
+    forward: ConfigKey,
+    backward: ConfigKey,
+    left: ConfigKey,
+    right: ConfigKey,
+    up: ConfigKey,
+    down: ConfigKey,
+    boost: ConfigKey,
+    slow: ConfigKey,
+}
+
+#[derive(Deserialize, Clone)]
+struct UiConfigToml {
+    toggle: ConfigKey,
+}
+
+#[derive(Deserialize, Clone)]
+struct SequencerConfigToml {
+    add_keyframe: ConfigKey,
+    play: ConfigKey,
+}
+
+#[derive(Deserialize, Clone)]
+struct RenderingConfigToml {
+    switch_to_reference_path_tracing: ConfigKey,
+    reset_path_tracer: ConfigKey,
+    light_enable_emissive: ConfigKey,
+}
+
+#[derive(Deserialize, Clone)]
+struct MiscConfigToml {
+    print_camera_transform: ConfigKey,
+}
+
+impl From<KeymapConfigToml> for KeymapConfig {
+    fn from(value: KeymapConfigToml) -> Self {
+        Self {
+            movement: value.movement.into(),
+            ui: value.ui.into(),
+            sequencer: value.sequencer.into(),
+            rendering: value.rendering.into(),
+            misc: value.misc.into(),
+        }
+    }
+}
+
+impl From<MovementConfigToml> for Movement {
+    fn from(value: MovementConfigToml) -> Self {
+        Self {
+            forward: value.forward.0,
+            backward: value.backward.0,
+            left: value.left.0,
+            right: value.right.0,
+            up: value.up.0,
+            down: value.down.0,
+            boost: value.boost.0,
+            slow: value.slow.0,
+        }
+    }
+}
+
+impl From<UiConfigToml> for Ui {
+    fn from(value: UiConfigToml) -> Self {
+        Self {
+            toggle: value.toggle.0,
+        }
+    }
+}
+
+impl From<SequencerConfigToml> for Sequencer {
+    fn from(value: SequencerConfigToml) -> Self {
+        Self {
+            add_keyframe: value.add_keyframe.0,
+            play: value.play.0,
+        }
+    }
+}
+
+impl From<RenderingConfigToml> for Rendering {
+    fn from(value: RenderingConfigToml) -> Self {
+        Self {
+            switch_to_reference_path_tracing: value.switch_to_reference_path_tracing.0,
+            reset_path_tracer: value.reset_path_tracer.0,
+            light_enable_emissive: value.light_enable_emissive.0,
+        }
+    }
+}
+
+impl From<MiscConfigToml> for Misc {
+    fn from(value: MiscConfigToml) -> Self {
+        Self {
+            print_camera_transform: value.print_camera_transform.0,
+        }
+    }
+}
+
+#[derive(Clone, Deserialize)]
+#[serde(transparent)]
+struct ConfigKey(#[serde(deserialize_with = "deserialize_key")] PhysicalKey);
+
+fn deserialize_key<'de, D>(deserializer: D) -> Result<PhysicalKey, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+
+    let key_name = match s.as_bytes() {
+        [c] if c.is_ascii_alphabetic() => {
+            format!("Key{}", s.to_ascii_uppercase())
+        }
+        _ => s,
+    };
+
+    let keycode: KeyCode = serde_plain::from_str(&key_name).map_err(serde::de::Error::custom)?;
+
+    Ok(PhysicalKey::Code(keycode))
 }

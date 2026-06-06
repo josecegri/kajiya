@@ -5,8 +5,8 @@ left = "A"
 right = "D"
 up = "Q"
 down = "E"
-boost = "LShift"
-slow = "LControl"
+boost = "ShiftLeft"
+slow = "ControlLeft"
 
 [ui]
 toggle = "Tab"
@@ -17,7 +17,7 @@ play = "P"
 
 [rendering]
 switch_to_reference_path_tracing = "Space"
-reset_path_tracer = "Back"
+reset_path_tracer = "Backspace"
 light_enable_emissive = "L"
 
 [misc]
