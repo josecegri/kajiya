@@ -73,6 +73,7 @@ impl ImGuiBackend {
             )
         };
 
+        #[allow(clippy::arc_with_non_send_sync)]
         Self {
             device,
             imgui_platform,
@@ -121,8 +122,8 @@ impl ImGuiBackend {
             .handle_event(imgui.io_mut(), window, event);
     }
 
-    pub fn prepare_frame<'a, 'imgui>(
-        &'a mut self,
+    pub fn prepare_frame<'imgui>(
+        &mut self,
         window: &winit::window::Window,
         imgui: &'imgui mut imgui::Context,
         dt: f32,

@@ -19,7 +19,7 @@ impl<T: Copy> BufferDataSource for &'static [T] {
         unsafe {
             std::slice::from_raw_parts(
                 self.as_ptr() as *const u8,
-                self.len() * std::mem::size_of::<T>(),
+                std::mem::size_of_val(*self),
             )
         }
     }
@@ -119,7 +119,7 @@ impl BufferBuilder {
             .enumerate()
             .flat_map(|(pending_idx, pending)| {
                 let byte_count = pending.source.as_bytes().len();
-                let chunk_count = (byte_count + STAGING_BYTES - 1) / STAGING_BYTES;
+                let chunk_count = byte_count.div_ceil(STAGING_BYTES);
                 (0..chunk_count).map(move |chunk| UploadChunk {
                     pending_idx,
                     src_range: chunk * STAGING_BYTES..((chunk + 1) * STAGING_BYTES).min(byte_count),

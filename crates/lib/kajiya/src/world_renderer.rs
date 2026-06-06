@@ -250,7 +250,7 @@ impl DynamicExposureState {
 
         let dt = dt * self.speed_log2.exp2();
 
-        let t_fast = 1.0 - (-1.0 * dt).exp();
+        let t_fast = 1.0 - (-dt).exp();
         self.ev_fast = (ev - self.ev_fast) * t_fast + self.ev_fast;
 
         let t_slow = 1.0 - (-0.25 * dt).exp();

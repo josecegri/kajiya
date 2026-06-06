@@ -35,14 +35,14 @@ pub struct RtrRenderer {
 
 fn as_byte_slice_unchecked<T: Copy>(v: &[T]) -> &[u8] {
     unsafe {
-        std::slice::from_raw_parts(v.as_ptr() as *const u8, v.len() * std::mem::size_of::<T>())
+        std::slice::from_raw_parts(v.as_ptr() as *const u8, std::mem::size_of_val(v))
     }
 }
 
 fn make_lut_buffer<T: Copy>(device: &Device, v: &[T]) -> Result<Arc<Buffer>, BackendError> {
     Ok(Arc::new(device.create_buffer(
         BufferDesc::new_gpu_only(
-            v.len() * std::mem::size_of::<T>(),
+            std::mem::size_of_val(v),
             vk::BufferUsageFlags::STORAGE_BUFFER,
         ),
         "lut buffer",

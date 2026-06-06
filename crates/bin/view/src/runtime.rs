@@ -128,11 +128,10 @@ impl RuntimeState {
         });
 
         // Load the IBL too
-        if let Some(ibl) = persisted.scene.ibl.as_ref() {
-            if world_renderer.ibl.load_image(ibl).is_err() {
+        if let Some(ibl) = persisted.scene.ibl.as_ref()
+            && world_renderer.ibl.load_image(ibl).is_err() {
                 persisted.scene.ibl = None;
             }
-        }
 
         res
     }
@@ -328,7 +327,7 @@ impl RuntimeState {
         let sun_interp_t = if ctx.world_renderer.render_mode == RenderMode::Reference {
             1.0
         } else {
-            (-1.0 * persisted.movement.sun_rotation_smoothness).exp2()
+            (-persisted.movement.sun_rotation_smoothness).exp2()
         };
 
         self.sun_direction_interp =
@@ -627,7 +626,7 @@ impl RuntimeState {
                 let cached_mesh_name = format!("{:8.8x}", path_hash);
                 let cached_mesh_path = PathBuf::from(format!("/cache/{}.mesh", cached_mesh_name));
 
-                if !canonical_path_from_vfs(&cached_mesh_path).map_or(false, |path| path.exists()) {
+                if !canonical_path_from_vfs(&cached_mesh_path).is_ok_and(|path| path.exists()) {
                     kajiya_asset_pipe::process_mesh_asset(
                         kajiya_asset_pipe::MeshAssetProcessParams {
                             path: path.clone(),

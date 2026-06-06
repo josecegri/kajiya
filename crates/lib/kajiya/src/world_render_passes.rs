@@ -189,8 +189,8 @@ impl WorldRenderer {
             self.rtr.create_dummy_output(rg, &gbuffer_depth)
         };
 
-        if any_triangle_lights {
-            if let Some(tlas) = tlas.as_ref() {
+        if any_triangle_lights
+            && let Some(tlas) = tlas.as_ref() {
                 // Render specular lighting into the RTR image so they can be jointly filtered
                 self.lighting.render_specular(
                     &mut rtr.resolved_tex,
@@ -200,7 +200,6 @@ impl WorldRenderer {
                     tlas,
                 );
             }
-        }
 
         let rtr = rtr.filter_temporal(rg, &gbuffer_depth, &reprojection_map);
 
@@ -265,8 +264,8 @@ impl WorldRenderer {
         let mut final_post_input =
             motion_blur(rg, &anti_aliased, &gbuffer_depth.depth, &reprojection_map);
 
-        if let Some(tlas) = tlas.as_ref() {
-            if matches!(self.debug_mode, RenderDebugMode::WorldRadianceCache) {
+        if let Some(tlas) = tlas.as_ref()
+            && matches!(self.debug_mode, RenderDebugMode::WorldRadianceCache) {
                 wrc.see_through(
                     rg,
                     &convolved_sky_cube,
@@ -276,7 +275,6 @@ impl WorldRenderer {
                     &mut final_post_input,
                 );
             }
-        }
 
         let post_processed = self.post.render(
             rg,

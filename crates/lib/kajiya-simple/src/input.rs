@@ -85,7 +85,7 @@ impl MouseState {
             match event {
                 Event::WindowEvent { event, .. } => match event {
                     WindowEvent::CursorMoved { position, .. } => {
-                        self.physical_position = position.clone();
+                        self.physical_position = *position;
                     }
                     WindowEvent::MouseInput { state, button, .. } => {
                         let button_id = match button {

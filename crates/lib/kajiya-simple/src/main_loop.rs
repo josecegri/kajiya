@@ -51,7 +51,7 @@ impl<'a> ImguiContext<'a> {
         let ui = self
             .imgui_backend
             .prepare_frame(self.window, self.imgui, self.dt_filtered);
-        callback(&ui);
+        callback(ui);
         self.imgui_backend
             .finish_frame(self.imgui, self.window, self.ui_renderer);
     }

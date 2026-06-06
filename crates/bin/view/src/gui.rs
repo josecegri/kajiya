@@ -20,7 +20,7 @@ impl RuntimeState {
                     .default_open(true)
                     .build(ui)
                 {
-                    imgui::Drag::<f32, &'static str>::new("EV shift")
+                    imgui::Drag::<f32, &str>::new("EV shift")
                         .range(-8.0, 12.0)
                         .speed(0.01)
                         .build(ui, &mut persisted.exposure.ev_shift);
@@ -30,12 +30,12 @@ impl RuntimeState {
                         &mut persisted.exposure.use_dynamic_adaptation,
                     );
 
-                    imgui::Drag::<f32, &'static str>::new("Adaptation speed")
+                    imgui::Drag::<f32, &str>::new("Adaptation speed")
                         .range(-4.0, 4.0)
                         .speed(0.01)
                         .build(ui, &mut persisted.exposure.dynamic_adaptation_speed);
 
-                    imgui::Drag::<f32, &'static str>::new("Luminance histogram low clip")
+                    imgui::Drag::<f32, &str>::new("Luminance histogram low clip")
                         .range(0.0, 1.0)
                         .speed(0.001)
                         .build(ui, &mut persisted.exposure.dynamic_adaptation_low_clip);
@@ -44,7 +44,7 @@ impl RuntimeState {
                         .dynamic_adaptation_low_clip
                         .clamp(0.0, 1.0);
 
-                    imgui::Drag::<f32, &'static str>::new("Luminance histogram high clip")
+                    imgui::Drag::<f32, &str>::new("Luminance histogram high clip")
                         .range(0.0, 1.0)
                         .speed(0.001)
                         .build(ui, &mut persisted.exposure.dynamic_adaptation_high_clip);
@@ -53,44 +53,44 @@ impl RuntimeState {
                         .dynamic_adaptation_high_clip
                         .clamp(0.0, 1.0);
 
-                    imgui::Drag::<f32, &'static str>::new("Contrast")
+                    imgui::Drag::<f32, &str>::new("Contrast")
                         .range(1.0, 1.5)
                         .speed(0.001)
                         .build(ui, &mut persisted.exposure.contrast);
 
-                    imgui::Drag::<f32, &'static str>::new("Emissive multiplier")
+                    imgui::Drag::<f32, &str>::new("Emissive multiplier")
                         .range(0.0, 10.0)
                         .speed(0.1)
                         .build(ui, &mut persisted.light.emissive_multiplier);
 
                     ui.checkbox("Enable emissive", &mut persisted.light.enable_emissive);
 
-                    imgui::Drag::<f32, &'static str>::new("Light intensity multiplier")
+                    imgui::Drag::<f32, &str>::new("Light intensity multiplier")
                         .range(0.0, 1000.0)
                         .speed(1.0)
                         .build(ui, &mut persisted.light.local_lights.multiplier);
 
-                    imgui::Drag::<f32, &'static str>::new("Camera speed")
+                    imgui::Drag::<f32, &str>::new("Camera speed")
                         .range(0.0, 10.0)
                         .speed(0.025)
                         .build(ui, &mut persisted.movement.camera_speed);
 
-                    imgui::Drag::<f32, &'static str>::new("Camera smoothness")
+                    imgui::Drag::<f32, &str>::new("Camera smoothness")
                         .range(0.0, 20.0)
                         .speed(0.1)
                         .build(ui, &mut persisted.movement.camera_smoothness);
 
-                    imgui::Drag::<f32, &'static str>::new("Sun rotation smoothness")
+                    imgui::Drag::<f32, &str>::new("Sun rotation smoothness")
                         .range(0.0, 20.0)
                         .speed(0.1)
                         .build(ui, &mut persisted.movement.sun_rotation_smoothness);
 
-                    imgui::Drag::<f32, &'static str>::new("Field of view")
+                    imgui::Drag::<f32, &str>::new("Field of view")
                         .range(1.0, 120.0)
                         .speed(0.25)
                         .build(ui, &mut persisted.camera.vertical_fov);
 
-                    imgui::Drag::<f32, &'static str>::new("Sun size")
+                    imgui::Drag::<f32, &str>::new("Sun size")
                         .range(0.0, 10.0)
                         .speed(0.02)
                         .build(ui, &mut persisted.light.sun.size_multiplier);
@@ -174,7 +174,7 @@ impl RuntimeState {
                             ui.set_next_item_width(200.0);
 
                             let mut scale = elem.transform.scale.x;
-                            imgui::Drag::<f32, &'static str>::new("scale")
+                            imgui::Drag::<f32, &str>::new("scale")
                                 .range(0.001, 1000.0)
                                 .speed(1.0)
                                 .flags(imgui::SliderFlags::LOGARITHMIC)
@@ -192,21 +192,21 @@ impl RuntimeState {
                         // Position
                         {
                             ui.set_next_item_width(100.0);
-                            imgui::Drag::<f32, &'static str>::new("x")
+                            imgui::Drag::<f32, &str>::new("x")
                                 .speed(0.01)
                                 .build(ui, &mut elem.transform.position.x);
 
                             ui.same_line();
 
                             ui.set_next_item_width(100.0);
-                            imgui::Drag::<f32, &'static str>::new("y")
+                            imgui::Drag::<f32, &str>::new("y")
                                 .speed(0.01)
                                 .build(ui, &mut elem.transform.position.y);
 
                             ui.same_line();
 
                             ui.set_next_item_width(100.0);
-                            imgui::Drag::<f32, &'static str>::new("z")
+                            imgui::Drag::<f32, &str>::new("z")
                                 .speed(0.01)
                                 .build(ui, &mut elem.transform.position.z);
                         }
@@ -214,21 +214,21 @@ impl RuntimeState {
                         // Rotation
                         {
                             ui.set_next_item_width(100.0);
-                            imgui::Drag::<f32, &'static str>::new("rx")
+                            imgui::Drag::<f32, &str>::new("rx")
                                 .speed(0.1)
                                 .build(ui, &mut elem.transform.rotation_euler_degrees.x);
 
                             ui.same_line();
 
                             ui.set_next_item_width(100.0);
-                            imgui::Drag::<f32, &'static str>::new("ry")
+                            imgui::Drag::<f32, &str>::new("ry")
                                 .speed(0.1)
                                 .build(ui, &mut elem.transform.rotation_euler_degrees.y);
 
                             ui.same_line();
 
                             ui.set_next_item_width(100.0);
-                            imgui::Drag::<f32, &'static str>::new("rz")
+                            imgui::Drag::<f32, &str>::new("rz")
                                 .speed(0.1)
                                 .build(ui, &mut elem.transform.rotation_euler_degrees.z);
                         }
@@ -266,7 +266,7 @@ impl RuntimeState {
                     );
                     do_flag!(RenderOverrideFlags::NO_METAL, "No metal");
 
-                    imgui::Drag::<f32, &'static str>::new("Roughness scale")
+                    imgui::Drag::<f32, &str>::new("Roughness scale")
                         .range(0.0, 4.0)
                         .speed(0.001)
                         .build(
@@ -294,7 +294,7 @@ impl RuntimeState {
 
                     ui.same_line();
                     ui.set_next_item_width(60.0);
-                    imgui::Drag::<f32, &'static str>::new("Speed")
+                    imgui::Drag::<f32, &str>::new("Speed")
                         .range(0.0, 4.0)
                         .speed(0.01)
                         .build(ui, &mut self.sequence_playback_speed);
@@ -335,26 +335,26 @@ impl RuntimeState {
 
                         ui.same_line();
                         ui.checkbox(
-                            &format!("Pos##{}", i),
+                            format!("Pos##{}", i),
                             &mut item.value.camera_position.is_some,
                         );
 
                         ui.same_line();
                         ui.checkbox(
-                            &format!("Dir##{}", i),
+                            format!("Dir##{}", i),
                             &mut item.value.camera_direction.is_some,
                         );
 
                         ui.same_line();
-                        ui.checkbox(&format!("Sun##{}", i), &mut item.value.towards_sun.is_some);
+                        ui.checkbox(format!("Sun##{}", i), &mut item.value.towards_sun.is_some);
 
                         ui.same_line();
-                        if ui.button(&format!("Delete##{}", i)) {
+                        if ui.button(format!("Delete##{}", i)) {
                             cmd = Cmd::DeleteKey(i);
                         }
 
                         ui.same_line();
-                        if ui.button(&format!("Replace##{}:", i)) {
+                        if ui.button(format!("Replace##{}:", i)) {
                             cmd = Cmd::ReplaceKey(i);
                         }
                     });

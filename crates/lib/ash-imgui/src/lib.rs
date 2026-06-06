@@ -6,7 +6,6 @@ use ash::{Device, vk};
 use imgui::{Context, DrawCmd, DrawCmdParams, DrawData, DrawIdx, DrawVert, internal::RawWrapper};
 use memoffset::offset_of;
 use std::{
-    ffi::CStr,
     mem,
     os::raw::{c_uchar, c_void},
     slice,
@@ -445,7 +444,7 @@ impl Renderer {
         render_pass: vk::RenderPass,
     ) -> Option<vk::Pipeline> {
         let pipeline = {
-            let shader_entry_name = CStr::from_bytes_with_nul(b"main\0").unwrap();
+            let shader_entry_name = c"main";
             let shader_stage_create_info = [
                 vk::PipelineShaderStageCreateInfo {
                     stage: vk::ShaderStageFlags::VERTEX,
@@ -604,7 +603,7 @@ impl Renderer {
                     vk::ShaderStageFlags::VERTEX,
                     0,
                     std::slice::from_raw_parts(
-                        dims_rcp.as_ptr() as *const f32 as *const u8,
+                        dims_rcp.as_ptr() as *const u8,
                         Renderer::PUSH_CONSTANT_SIZE,
                     ),
                 )
