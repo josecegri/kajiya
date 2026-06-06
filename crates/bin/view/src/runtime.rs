@@ -511,7 +511,6 @@ impl RuntimeState {
         }
     }
 
-    #[expect(unused)]
     pub fn is_sequence_playing(&self) -> bool {
         matches!(
             &self.sequence_playback_state,
@@ -553,7 +552,6 @@ impl RuntimeState {
         }
     }
 
-    #[expect(unused)]
     pub fn jump_to_sequence_key(&mut self, persisted: &mut PersistedState, idx: usize) {
         let exact_item = if let Some(item) = persisted.sequence.get_item(idx) {
             item.clone()
@@ -588,7 +586,6 @@ impl RuntimeState {
         self.sequence_playback_state = SequencePlaybackState::NotPlaying;
     }
 
-    #[expect(unused)]
     pub fn replace_camera_sequence_key(&mut self, persisted: &mut PersistedState, idx: usize) {
         persisted.sequence.each_key(|i, item| {
             if idx != i {
@@ -601,7 +598,6 @@ impl RuntimeState {
         })
     }
 
-    #[expect(unused)]
     pub fn delete_camera_sequence_key(&mut self, persisted: &mut PersistedState, idx: usize) {
         persisted.sequence.delete_key(idx);
 

@@ -1,46 +1,42 @@
-// use imgui::im_str;
-// use kajiya::RenderOverrideFlags;
+use kajiya::RenderOverrideFlags;
 use kajiya_simple::*;
 
 use crate::{
     PersistedState,
-    //runtime::{MAX_FPS_LIMIT, RuntimeState},
-    runtime::RuntimeState,
+    runtime::{MAX_FPS_LIMIT, RuntimeState},
 };
 
 impl RuntimeState {
-    pub fn do_gui(&mut self, _persisted: &mut PersistedState, ctx: &mut FrameContext) {
+    pub fn do_gui(&mut self, persisted: &mut PersistedState, ctx: &mut FrameContext) {
         if self.keyboard.was_just_pressed(self.keymap_config.ui.toggle) {
             self.show_gui = !self.show_gui;
         }
 
         ctx.world_renderer.rg_debug_hook = self.locked_rg_debug_hook.clone();
 
-        // TODO restore gui rendering
-        /*
         if self.show_gui {
             ctx.imgui.take().unwrap().frame(|ui| {
-                if imgui::CollapsingHeader::new(im_str!("Tweaks"))
+                if imgui::CollapsingHeader::new("Tweaks")
                     .default_open(true)
                     .build(ui)
                 {
-                    imgui::Drag::<f32>::new(im_str!("EV shift"))
-                        .range(-8.0..=12.0)
+                    imgui::Drag::<f32, &'static str>::new("EV shift")
+                        .range(-8.0, 12.0)
                         .speed(0.01)
                         .build(ui, &mut persisted.exposure.ev_shift);
 
                     ui.checkbox(
-                        im_str!("Use dynamic exposure"),
+                        "Use dynamic exposure",
                         &mut persisted.exposure.use_dynamic_adaptation,
                     );
 
-                    imgui::Drag::<f32>::new(im_str!("Adaptation speed"))
-                        .range(-4.0..=4.0)
+                    imgui::Drag::<f32, &'static str>::new("Adaptation speed")
+                        .range(-4.0, 4.0)
                         .speed(0.01)
                         .build(ui, &mut persisted.exposure.dynamic_adaptation_speed);
 
-                    imgui::Drag::<f32>::new(im_str!("Luminance histogram low clip"))
-                        .range(0.0..=1.0)
+                    imgui::Drag::<f32, &'static str>::new("Luminance histogram low clip")
+                        .range(0.0, 1.0)
                         .speed(0.001)
                         .build(ui, &mut persisted.exposure.dynamic_adaptation_low_clip);
                     persisted.exposure.dynamic_adaptation_low_clip = persisted
@@ -48,8 +44,8 @@ impl RuntimeState {
                         .dynamic_adaptation_low_clip
                         .clamp(0.0, 1.0);
 
-                    imgui::Drag::<f32>::new(im_str!("Luminance histogram high clip"))
-                        .range(0.0..=1.0)
+                    imgui::Drag::<f32, &'static str>::new("Luminance histogram high clip")
+                        .range(0.0, 1.0)
                         .speed(0.001)
                         .build(ui, &mut persisted.exposure.dynamic_adaptation_high_clip);
                     persisted.exposure.dynamic_adaptation_high_clip = persisted
@@ -57,81 +53,78 @@ impl RuntimeState {
                         .dynamic_adaptation_high_clip
                         .clamp(0.0, 1.0);
 
-                    imgui::Drag::<f32>::new(im_str!("Contrast"))
-                        .range(1.0..=1.5)
+                    imgui::Drag::<f32, &'static str>::new("Contrast")
+                        .range(1.0, 1.5)
                         .speed(0.001)
                         .build(ui, &mut persisted.exposure.contrast);
 
-                    imgui::Drag::<f32>::new(im_str!("Emissive multiplier"))
-                        .range(0.0..=10.0)
+                    imgui::Drag::<f32, &'static str>::new("Emissive multiplier")
+                        .range(0.0, 10.0)
                         .speed(0.1)
                         .build(ui, &mut persisted.light.emissive_multiplier);
 
-                    ui.checkbox(
-                        im_str!("Enable emissive"),
-                        &mut persisted.light.enable_emissive,
-                    );
+                    ui.checkbox("Enable emissive", &mut persisted.light.enable_emissive);
 
-                    imgui::Drag::<f32>::new(im_str!("Light intensity multiplier"))
-                        .range(0.0..=1000.0)
+                    imgui::Drag::<f32, &'static str>::new("Light intensity multiplier")
+                        .range(0.0, 1000.0)
                         .speed(1.0)
                         .build(ui, &mut persisted.light.local_lights.multiplier);
 
-                    imgui::Drag::<f32>::new(im_str!("Camera speed"))
-                        .range(0.0..=10.0)
+                    imgui::Drag::<f32, &'static str>::new("Camera speed")
+                        .range(0.0, 10.0)
                         .speed(0.025)
                         .build(ui, &mut persisted.movement.camera_speed);
 
-                    imgui::Drag::<f32>::new(im_str!("Camera smoothness"))
-                        .range(0.0..=20.0)
+                    imgui::Drag::<f32, &'static str>::new("Camera smoothness")
+                        .range(0.0, 20.0)
                         .speed(0.1)
                         .build(ui, &mut persisted.movement.camera_smoothness);
 
-                    imgui::Drag::<f32>::new(im_str!("Sun rotation smoothness"))
-                        .range(0.0..=20.0)
+                    imgui::Drag::<f32, &'static str>::new("Sun rotation smoothness")
+                        .range(0.0, 20.0)
                         .speed(0.1)
                         .build(ui, &mut persisted.movement.sun_rotation_smoothness);
 
-                    imgui::Drag::<f32>::new(im_str!("Field of view"))
-                        .range(1.0..=120.0)
+                    imgui::Drag::<f32, &'static str>::new("Field of view")
+                        .range(1.0, 120.0)
                         .speed(0.25)
                         .build(ui, &mut persisted.camera.vertical_fov);
 
-                    imgui::Drag::<f32>::new(im_str!("Sun size"))
-                        .range(0.0..=10.0)
+                    imgui::Drag::<f32, &'static str>::new("Sun size")
+                        .range(0.0, 10.0)
                         .speed(0.02)
                         .build(ui, &mut persisted.light.sun.size_multiplier);
 
                     /*ui.checkbox(
-                        im_str!("Show world radiance cache"),
+                        "Show world radiance cache",
                         &mut ctx.world_renderer.debug_show_wrc,
                     );*/
 
                     /*if ui.radio_button_bool(
-                        im_str!("Move sun"),
+                        "Move sun",
                         left_click_edit_mode == LeftClickEditMode::MoveSun,
                     ) {
                         left_click_edit_mode = LeftClickEditMode::MoveSun;
                     }
 
                     if ui.radio_button_bool(
-                        im_str!("Move local lights"),
+                        "Move local lights",
                         left_click_edit_mode == LeftClickEditMode::MoveLocalLights,
                     ) {
                         left_click_edit_mode = LeftClickEditMode::MoveLocalLights;
                     }
 
-                    imgui::Drag::<u32>::new(im_str!("Light count"))
-                        .range(0..=10)
+                    imgui::Drag::<u32>::new("Light count")
+                        .range(0, 10)
                         .build(ui, &mut state.lights.count);*/
 
                     ui.checkbox(
-                        im_str!("Scroll irradiance cache"),
+                        "Scroll irradiance cache",
                         &mut ctx.world_renderer.ircache.enable_scroll,
                     );
 
-                    imgui::Drag::<u32>::new(im_str!("GI spatial reuse passes"))
-                        .range(1..=3)
+                    imgui::Drag::<u32, &'static str>::new("GI spatial reuse passes")
+                        .range(1, 3)
                         .build(ui, &mut ctx.world_renderer.rtdgi.spatial_reuse_pass_count);
 
                     ctx.world_renderer.rtdgi.spatial_reuse_pass_count = ctx
@@ -141,48 +134,48 @@ impl RuntimeState {
                         .clamp(1, 3);
 
                     ui.checkbox(
-                        im_str!("Ray-traced reservoir visibility"),
+                        "Ray-traced reservoir visibility",
                         &mut ctx.world_renderer.rtdgi.use_raytraced_reservoir_visibility,
                     );
 
                     ui.checkbox(
-                        im_str!("Allow diffuse ray reuse for reflections"),
+                        "Allow diffuse ray reuse for reflections",
                         &mut ctx.world_renderer.rtr.reuse_rtdgi_rays,
                     );
 
                     #[cfg(feature = "dlss")]
                     {
-                        ui.checkbox(im_str!("Use DLSS"), &mut ctx.world_renderer.use_dlss);
+                        ui.checkbox("Use DLSS", &mut ctx.world_renderer.use_dlss);
                     }
                 }
 
-                if imgui::CollapsingHeader::new(im_str!("Scene"))
+                if imgui::CollapsingHeader::new("Scene")
                     .default_open(true)
                     .build(ui)
                 {
                     if let Some(ibl) = persisted.scene.ibl.as_ref() {
-                        ui.text(im_str!("IBL: {:?}", ibl));
-                        if ui.button(im_str!("Unload"), [0.0, 0.0]) {
+                        ui.text(format!("IBL: {:?}", ibl));
+                        if ui.button("Unload") {
                             ctx.world_renderer.ibl.unload_image();
                             persisted.scene.ibl = None;
                         }
                     } else {
-                        ui.text(im_str!("Drag a sphere-mapped .hdr/.exr to load as IBL"));
+                        ui.text("Drag a sphere-mapped .hdr/.exr to load as IBL");
                     }
 
                     let mut element_to_remove = None;
                     for (idx, elem) in persisted.scene.elements.iter_mut().enumerate() {
                         ui.dummy([0.0, 10.0]);
 
-                        let id_token = ui.push_id(idx as i32);
-                        ui.text(im_str!("{:?}", elem.source));
+                        let id_token = ui.push_id(format!("{}", idx as i32));
+                        ui.text(format!("{:?}", elem.source));
 
                         {
                             ui.set_next_item_width(200.0);
 
                             let mut scale = elem.transform.scale.x;
-                            imgui::Drag::<f32>::new(im_str!("scale"))
-                                .range(0.001..=1000.0)
+                            imgui::Drag::<f32, &'static str>::new("scale")
+                                .range(0.001, 1000.0)
                                 .speed(1.0)
                                 .flags(imgui::SliderFlags::LOGARITHMIC)
                                 .build(ui, &mut scale);
@@ -191,29 +184,29 @@ impl RuntimeState {
                             }
                         }
 
-                        ui.same_line(0.0);
-                        if ui.button(im_str!("Delete"), [0.0, 0.0]) {
+                        ui.same_line();
+                        if ui.button("Delete") {
                             element_to_remove = Some(idx);
                         }
 
                         // Position
                         {
                             ui.set_next_item_width(100.0);
-                            imgui::Drag::<f32>::new(im_str!("x"))
+                            imgui::Drag::<f32, &'static str>::new("x")
                                 .speed(0.01)
                                 .build(ui, &mut elem.transform.position.x);
 
-                            ui.same_line(0.0);
+                            ui.same_line();
 
                             ui.set_next_item_width(100.0);
-                            imgui::Drag::<f32>::new(im_str!("y"))
+                            imgui::Drag::<f32, &'static str>::new("y")
                                 .speed(0.01)
                                 .build(ui, &mut elem.transform.position.y);
 
-                            ui.same_line(0.0);
+                            ui.same_line();
 
                             ui.set_next_item_width(100.0);
-                            imgui::Drag::<f32>::new(im_str!("z"))
+                            imgui::Drag::<f32, &'static str>::new("z")
                                 .speed(0.01)
                                 .build(ui, &mut elem.transform.position.z);
                         }
@@ -221,26 +214,26 @@ impl RuntimeState {
                         // Rotation
                         {
                             ui.set_next_item_width(100.0);
-                            imgui::Drag::<f32>::new(im_str!("rx"))
+                            imgui::Drag::<f32, &'static str>::new("rx")
                                 .speed(0.1)
                                 .build(ui, &mut elem.transform.rotation_euler_degrees.x);
 
-                            ui.same_line(0.0);
+                            ui.same_line();
 
                             ui.set_next_item_width(100.0);
-                            imgui::Drag::<f32>::new(im_str!("ry"))
+                            imgui::Drag::<f32, &'static str>::new("ry")
                                 .speed(0.1)
                                 .build(ui, &mut elem.transform.rotation_euler_degrees.y);
 
-                            ui.same_line(0.0);
+                            ui.same_line();
 
                             ui.set_next_item_width(100.0);
-                            imgui::Drag::<f32>::new(im_str!("rz"))
+                            imgui::Drag::<f32, &'static str>::new("rz")
                                 .speed(0.1)
                                 .build(ui, &mut elem.transform.rotation_euler_degrees.z);
                         }
 
-                        id_token.pop(ui);
+                        id_token.pop();
                     }
 
                     if let Some(idx) = element_to_remove {
@@ -249,7 +242,7 @@ impl RuntimeState {
                     }
                 }
 
-                if imgui::CollapsingHeader::new(im_str!("Overrides"))
+                if imgui::CollapsingHeader::new("Overrides")
                     .default_open(false)
                     .build(ui)
                 {
@@ -257,7 +250,7 @@ impl RuntimeState {
                         ($flag:path, $name:literal) => {
                             let mut is_set: bool =
                                 ctx.world_renderer.render_overrides.has_flag($flag);
-                            ui.checkbox(im_str!($name), &mut is_set);
+                            ui.checkbox($name, &mut is_set);
                             ctx.world_renderer.render_overrides.set_flag($flag, is_set);
                         };
                     }
@@ -273,8 +266,8 @@ impl RuntimeState {
                     );
                     do_flag!(RenderOverrideFlags::NO_METAL, "No metal");
 
-                    imgui::Drag::<f32>::new(im_str!("Roughness scale"))
-                        .range(0.0..=4.0)
+                    imgui::Drag::<f32, &'static str>::new("Roughness scale")
+                        .range(0.0, 4.0)
                         .speed(0.001)
                         .build(
                             ui,
@@ -282,33 +275,33 @@ impl RuntimeState {
                         );
                 }
 
-                if imgui::CollapsingHeader::new(im_str!("Sequence"))
+                if imgui::CollapsingHeader::new("Sequence")
                     .default_open(false)
                     .build(ui)
                 {
-                    if ui.button(im_str!("Add key"), [0.0, 0.0]) {
+                    if ui.button("Add key") {
                         self.add_sequence_keyframe(persisted);
                     }
 
-                    ui.same_line(0.0);
+                    ui.same_line();
                     if self.is_sequence_playing() {
-                        if ui.button(im_str!("Stop"), [0.0, 0.0]) {
+                        if ui.button("Stop") {
                             self.stop_sequence();
                         }
-                    } else if ui.button(im_str!("Play"), [0.0, 0.0]) {
+                    } else if ui.button("Play") {
                         self.play_sequence(persisted);
                     }
 
-                    ui.same_line(0.0);
+                    ui.same_line();
                     ui.set_next_item_width(60.0);
-                    imgui::Drag::<f32>::new(im_str!("Speed"))
-                        .range(0.0..=4.0)
+                    imgui::Drag::<f32, &'static str>::new("Speed")
+                        .range(0.0, 4.0)
                         .speed(0.01)
                         .build(ui, &mut self.sequence_playback_speed);
 
                     if self.active_camera_key.is_some() {
-                        ui.same_line(0.0);
-                        if ui.button(im_str!("Deselect key"), [0.0, 0.0]) {
+                        ui.same_line();
+                        if ui.button("Deselect key") {
                             self.active_camera_key = None;
                         }
                     }
@@ -325,42 +318,43 @@ impl RuntimeState {
                         let active = Some(i) == self.active_camera_key;
 
                         let label = if active {
-                            im_str!("-> {}:", i)
+                            format!("-> {}:", i)
                         } else {
-                            im_str!("{}:", i)
+                            format!("{}:", i)
                         };
 
-                        if ui.button(&label, [0.0, 0.0]) {
+                        if ui.button(&label) {
                             cmd = Cmd::JumpToKey(i);
                         }
 
-                        ui.same_line(0.0);
+                        ui.same_line();
                         ui.set_next_item_width(60.0);
-                        imgui::InputFloat::new(ui, &im_str!("duration##{}", i), &mut item.duration)
+                        #[allow(deprecated)]
+                        imgui::InputFloat::new(ui, &format!("duration##{}", i), &mut item.duration)
                             .build();
 
-                        ui.same_line(0.0);
+                        ui.same_line();
                         ui.checkbox(
-                            &im_str!("Pos##{}", i),
+                            &format!("Pos##{}", i),
                             &mut item.value.camera_position.is_some,
                         );
 
-                        ui.same_line(0.0);
+                        ui.same_line();
                         ui.checkbox(
-                            &im_str!("Dir##{}", i),
+                            &format!("Dir##{}", i),
                             &mut item.value.camera_direction.is_some,
                         );
 
-                        ui.same_line(0.0);
-                        ui.checkbox(&im_str!("Sun##{}", i), &mut item.value.towards_sun.is_some);
+                        ui.same_line();
+                        ui.checkbox(&format!("Sun##{}", i), &mut item.value.towards_sun.is_some);
 
-                        ui.same_line(0.0);
-                        if ui.button(&im_str!("Delete##{}", i), [0.0, 0.0]) {
+                        ui.same_line();
+                        if ui.button(&format!("Delete##{}", i)) {
                             cmd = Cmd::DeleteKey(i);
                         }
 
-                        ui.same_line(0.0);
-                        if ui.button(&im_str!("Replace##{}:", i), [0.0, 0.0]) {
+                        ui.same_line();
+                        if ui.button(&format!("Replace##{}:", i)) {
                             cmd = Cmd::ReplaceKey(i);
                         }
                     });
@@ -373,49 +367,49 @@ impl RuntimeState {
                     }
                 }
 
-                if imgui::CollapsingHeader::new(im_str!("Debug"))
+                if imgui::CollapsingHeader::new("Debug")
                     .default_open(false)
                     .build(ui)
                 {
                     if ui.radio_button_bool(
-                        im_str!("Scene geometry"),
+                        "Scene geometry",
                         ctx.world_renderer.debug_mode == RenderDebugMode::None,
                     ) {
                         ctx.world_renderer.debug_mode = RenderDebugMode::None;
                     }
 
                     /*if ui.radio_button_bool(
-                        im_str!("World radiance cache"),
+                        "World radiance cache",
                         ctx.world_renderer.debug_mode == RenderDebugMode::WorldRadianceCache,
                     ) {
                         ctx.world_renderer.debug_mode = RenderDebugMode::WorldRadianceCache;
                     }*/
 
-                    imgui::ComboBox::new(im_str!("Shading")).build_simple_string(
-                        ui,
+                    ui.combo_simple_string(
+                        "Shading",
                         &mut ctx.world_renderer.debug_shading_mode,
                         &[
-                            im_str!("Default"),
-                            im_str!("No base color"),
-                            im_str!("Diffuse GI"),
-                            im_str!("Reflections"),
-                            im_str!("RTX OFF"),
-                            im_str!("Irradiance cache"),
+                            "Default",
+                            "No base color",
+                            "Diffuse GI",
+                            "Reflections",
+                            "RTX OFF",
+                            "Irradiance cache",
                         ],
                     );
 
-                    imgui::Drag::<u32>::new(im_str!("Max FPS"))
-                        .range(1..=MAX_FPS_LIMIT)
+                    imgui::Drag::<u32, &'static str>::new("Max FPS")
+                        .range(1, MAX_FPS_LIMIT)
                         .build(ui, &mut self.max_fps);
 
                     // TODO: consider removing unsafety
                     #[allow(static_mut_refs)]
-                    ui.checkbox(im_str!("Allow pass overlap"), unsafe {
+                    ui.checkbox("Allow pass overlap", unsafe {
                         &mut kajiya::rg::RG_ALLOW_PASS_OVERLAP
                     });
                 }
 
-                if imgui::CollapsingHeader::new(im_str!("GPU passes"))
+                if imgui::CollapsingHeader::new("GPU passes")
                     .default_open(true)
                     .build(ui)
                 {
@@ -452,14 +446,14 @@ impl RuntimeState {
                             ui.text(format!("{}: {:.3}ms", scope.name, scope.duration.ms()));
 
                             if let Some(style) = style {
-                                style.pop(ui);
+                                style.pop();
                             }
 
                             if ui.is_item_hovered() {
                                 ctx.world_renderer.rg_debug_hook =
                                     Some(kajiya::rg::GraphDebugHook { render_debug_hook });
 
-                                if ui.is_item_clicked(imgui::MouseButton::Left) {
+                                if ui.is_item_clicked() {
                                     if self.locked_rg_debug_hook == ctx.world_renderer.rg_debug_hook
                                     {
                                         self.locked_rg_debug_hook = None;
@@ -474,6 +468,5 @@ impl RuntimeState {
                 }
             });
         }
-        */
     }
 }

@@ -121,32 +121,30 @@ impl ImGuiBackend {
             .handle_event(imgui.io_mut(), window, event);
     }
 
-    pub fn prepare_frame<'a>(
+    pub fn prepare_frame<'a, 'imgui>(
         &'a mut self,
         window: &winit::window::Window,
-        imgui: &'a mut imgui::Context,
+        imgui: &'imgui mut imgui::Context,
         dt: f32,
-    ) -> &'a mut imgui::Ui {
+    ) -> &'imgui mut imgui::Ui {
         self.imgui_platform
             .prepare_frame(imgui.io_mut(), window)
             .expect("Failed to prepare frame");
         imgui.io_mut().delta_time = dt;
-        imgui.new_frame()
+        let ui = imgui.new_frame();
+        self.imgui_platform.prepare_render(ui, window);
+        ui
     }
 
     pub fn finish_frame(
         &mut self,
-        mut _ui: imgui::Ui,
-        _window: &winit::window::Window,
-        _ui_renderer: &mut UiRenderer,
+        imgui: &mut imgui::Context,
+        window: &winit::window::Window,
+        ui_renderer: &mut UiRenderer,
     ) {
-        // TODO restore gui rendering
-        /*
         let (ui_draw_data, ui_target_image) = {
-            self.imgui_platform.prepare_render(&ui, window);
-
             let ui_draw_data: &'static imgui::DrawData =
-                unsafe { std::mem::transmute(ui.render()) };
+                unsafe { std::mem::transmute(imgui.render()) };
 
             (ui_draw_data, self.inner.lock().get_target_image().unwrap())
         };
@@ -166,7 +164,6 @@ impl ImGuiBackend {
             }),
             ui_target_image,
         ));
-        */
     }
 }
 
@@ -190,12 +187,10 @@ impl ImGuiBackendInner {
         self.gfx = Some(gfx);
     }
 
-    #[expect(unused)]
     fn get_target_image(&self) -> Option<Arc<Image>> {
         self.gfx.as_ref().map(|res| res.imgui_texture.clone())
     }
 
-    #[expect(unused)]
     fn render(
         &mut self,
         physical_size: [u32; 2],

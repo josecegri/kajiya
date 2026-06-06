@@ -38,30 +38,22 @@ impl<'a> FrameContext<'a> {
 
 #[cfg(feature = "dear-imgui")]
 pub struct ImguiContext<'a> {
-    #[expect(unused)]
     imgui: &'a mut imgui::Context,
-    #[expect(unused)]
     imgui_backend: &'a mut ImGuiBackend,
-    #[expect(unused)]
     ui_renderer: &'a mut UiRenderer,
-    #[expect(unused)]
     window: &'a winit::window::Window,
-    #[expect(unused)]
     dt_filtered: f32,
 }
 
 #[cfg(feature = "dear-imgui")]
 impl<'a> ImguiContext<'a> {
-    pub fn frame(self, _callback: impl FnOnce(&imgui::Ui)) {
-        // TODO restore gui rendering
-        /*
+    pub fn frame(self, callback: impl FnOnce(&imgui::Ui)) {
         let ui = self
             .imgui_backend
             .prepare_frame(self.window, self.imgui, self.dt_filtered);
         callback(&ui);
         self.imgui_backend
-            .finish_frame(ui, self.window, self.ui_renderer);
-        */
+            .finish_frame(self.imgui, self.window, self.ui_renderer);
     }
 }
 
