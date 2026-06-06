@@ -34,9 +34,7 @@ pub struct RtrRenderer {
 }
 
 fn as_byte_slice_unchecked<T: Copy>(v: &[T]) -> &[u8] {
-    unsafe {
-        std::slice::from_raw_parts(v.as_ptr() as *const u8, std::mem::size_of_val(v))
-    }
+    unsafe { std::slice::from_raw_parts(v.as_ptr() as *const u8, std::mem::size_of_val(v)) }
 }
 
 fn make_lut_buffer<T: Copy>(device: &Device, v: &[T]) -> Result<Arc<Buffer>, BackendError> {

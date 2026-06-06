@@ -129,9 +129,10 @@ impl RuntimeState {
 
         // Load the IBL too
         if let Some(ibl) = persisted.scene.ibl.as_ref()
-            && world_renderer.ibl.load_image(ibl).is_err() {
-                persisted.scene.ibl = None;
-            }
+            && world_renderer.ibl.load_image(ibl).is_err()
+        {
+            persisted.scene.ibl = None;
+        }
 
         res
     }

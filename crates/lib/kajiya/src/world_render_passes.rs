@@ -189,17 +189,16 @@ impl WorldRenderer {
             self.rtr.create_dummy_output(rg, &gbuffer_depth)
         };
 
-        if any_triangle_lights
-            && let Some(tlas) = tlas.as_ref() {
-                // Render specular lighting into the RTR image so they can be jointly filtered
-                self.lighting.render_specular(
-                    &mut rtr.resolved_tex,
-                    rg,
-                    &gbuffer_depth,
-                    self.bindless_descriptor_set,
-                    tlas,
-                );
-            }
+        if any_triangle_lights && let Some(tlas) = tlas.as_ref() {
+            // Render specular lighting into the RTR image so they can be jointly filtered
+            self.lighting.render_specular(
+                &mut rtr.resolved_tex,
+                rg,
+                &gbuffer_depth,
+                self.bindless_descriptor_set,
+                tlas,
+            );
+        }
 
         let rtr = rtr.filter_temporal(rg, &gbuffer_depth, &reprojection_map);
 
@@ -265,16 +264,17 @@ impl WorldRenderer {
             motion_blur(rg, &anti_aliased, &gbuffer_depth.depth, &reprojection_map);
 
         if let Some(tlas) = tlas.as_ref()
-            && matches!(self.debug_mode, RenderDebugMode::WorldRadianceCache) {
-                wrc.see_through(
-                    rg,
-                    &convolved_sky_cube,
-                    &mut ircache_state,
-                    self.bindless_descriptor_set,
-                    tlas,
-                    &mut final_post_input,
-                );
-            }
+            && matches!(self.debug_mode, RenderDebugMode::WorldRadianceCache)
+        {
+            wrc.see_through(
+                rg,
+                &convolved_sky_cube,
+                &mut ircache_state,
+                self.bindless_descriptor_set,
+                tlas,
+                &mut final_post_input,
+            );
+        }
 
         let post_processed = self.post.render(
             rg,

@@ -17,10 +17,7 @@ struct PendingBufferUpload {
 impl<T: Copy> BufferDataSource for &'static [T] {
     fn as_bytes(&self) -> &[u8] {
         unsafe {
-            std::slice::from_raw_parts(
-                self.as_ptr() as *const u8,
-                std::mem::size_of_val(*self),
-            )
+            std::slice::from_raw_parts(self.as_ptr() as *const u8, std::mem::size_of_val(*self))
         }
     }
 
