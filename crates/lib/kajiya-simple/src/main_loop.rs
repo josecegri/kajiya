@@ -206,25 +206,23 @@ impl SimpleMainLoop {
 
         let event_loop = EventLoop::new()?;
 
-        if let Some(fullscreen) = builder.fullscreen {
-            window_attributes = window_attributes.with_fullscreen(match fullscreen {
-                FullscreenMode::Borderless => Some(Fullscreen::Borderless(None)),
-                _ => panic!("// TODO restore fullscreen mode"),
-                /*
-                FullscreenMode::Exclusive => Some(Fullscreen::Exclusive(
-                    event_loop
-                        .primary_monitor()
-                        .expect("at least one monitor")
-                        .video_modes()
-                        .next()
-                        .expect("at least one video mode"),
-                )),
-                */
-            });
+        if let Some(FullscreenMode::Borderless) = builder.fullscreen {
+            window_attributes =
+                window_attributes.with_fullscreen(Some(Fullscreen::Borderless(None)));
         }
 
         #[allow(deprecated)]
         let window = event_loop.create_window(window_attributes).expect("window");
+
+        if let Some(FullscreenMode::Exclusive) = builder.fullscreen {
+            let monitor = window.current_monitor().expect("at least one monitor");
+            let mode = monitor
+                .video_modes()
+                .next()
+                .expect("at least one video mode");
+
+            window.set_fullscreen(Some(Fullscreen::Exclusive(mode)));
+        }
 
         // Physical window extent in pixels
         let swapchain_extent = [window.inner_size().width, window.inner_size().height];
