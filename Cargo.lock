@@ -180,15 +180,15 @@ dependencies = [
 
 [[package]]
 name = "async-executor"
-version = "1.4.1"
+version = "1.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "871f9bb5e0a22eeb7e8cf16641feb87c9dc67032ccf8ff49e772eb9941d3a965"
+checksum = "c96bf972d85afc50bf5ab8fe2d54d1586b4e0b46c97c50a0c9e71e2f7bcd812a"
 dependencies = [
  "async-task",
- "concurrent-queue 1.2.2",
- "fastrand",
- "futures-lite",
- "once_cell",
+ "concurrent-queue 2.5.0",
+ "fastrand 2.4.1",
+ "futures-lite 2.0.0",
+ "pin-project-lite",
  "slab",
 ]
 
@@ -200,7 +200,7 @@ checksum = "8b3ca4f8ff117c37c278a2f7415ce9be55560b846b5bc4412aaa5d29c1c3dae2"
 dependencies = [
  "async-lock",
  "blocking",
- "futures-lite",
+ "futures-lite 1.12.0",
 ]
 
 [[package]]
@@ -210,7 +210,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a811e6a479f2439f0c04038796b5cfb3d2ad56c230e0f2d3f7b04d68cfee607b"
 dependencies = [
  "concurrent-queue 1.2.2",
- "futures-lite",
+ "futures-lite 1.12.0",
  "libc",
  "log",
  "once_cell",
@@ -239,7 +239,7 @@ checksum = "5373304df79b9b4395068fb080369ec7178608827306ce4d081cba51cac551df"
 dependencies = [
  "async-io",
  "blocking",
- "futures-lite",
+ "futures-lite 1.12.0",
 ]
 
 [[package]]
@@ -252,7 +252,7 @@ dependencies = [
  "blocking",
  "cfg-if 1.0.4",
  "event-listener",
- "futures-lite",
+ "futures-lite 1.12.0",
  "libc",
  "once_cell",
  "signal-hook",
@@ -261,9 +261,9 @@ dependencies = [
 
 [[package]]
 name = "async-task"
-version = "4.0.3"
+version = "4.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e91831deabf0d6d7ec49552e489aed63b7456a7a3c46cff62adad428110b0af0"
+checksum = "8b75356056920673b02621b35afd0f7dda9306d03c79a30f5c56c44cf256e3de"
 
 [[package]]
 name = "async-trait"
@@ -332,12 +332,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3441f0f7b02788e948e47f457ca01f1d7e6d92c693bc132c22b087d3141c03ff"
 
 [[package]]
-name = "base64"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
-
-[[package]]
 name = "bincode"
 version = "1.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -386,6 +380,9 @@ name = "bitflags"
 version = "2.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c4512299f36f043ab09a583e57bceb5a5aab7a73db1805848e8fef3c9e8c78b3"
+dependencies = [
+ "serde_core",
+]
 
 [[package]]
 name = "bitvec"
@@ -423,8 +420,8 @@ dependencies = [
  "async-channel",
  "async-task",
  "atomic-waker",
- "fastrand",
- "futures-lite",
+ "fastrand 1.5.0",
+ "futures-lite 1.12.0",
  "once_cell",
 ]
 
@@ -927,9 +924,9 @@ dependencies = [
 
 [[package]]
 name = "easy-parallel"
-version = "3.1.0"
+version = "3.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1dd4afd79212583ff429b913ad6605242ed7eec277e950b1438f300748f948f4"
+checksum = "2afbb9b0aef60e4f0d2b18129b6c0dff035a6f7dbbd17c2f38c1432102ee223c"
 
 [[package]]
 name = "either"
@@ -998,6 +995,12 @@ checksum = "b394ed3d285a429378d3b384b9eb1285267e7df4b166df24b7a6939a04dc392e"
 dependencies = [
  "instant",
 ]
+
+[[package]]
+name = "fastrand"
+version = "2.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9f1f227452a390804cdb637b74a86990f2a7d7ba4b7d5693aac9b4dd6defd8d6"
 
 [[package]]
 name = "fern"
@@ -1164,7 +1167,22 @@ version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7694489acd39452c77daa48516b894c153f192c3578d5a839b62c58099fcbf48"
 dependencies = [
- "fastrand",
+ "fastrand 1.5.0",
+ "futures-core",
+ "futures-io",
+ "memchr",
+ "parking",
+ "pin-project-lite",
+ "waker-fn",
+]
+
+[[package]]
+name = "futures-lite"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9c1155db57329dca6d018b61e76b1488ce9a2e5e44028cac420a5898f4fcef63"
+dependencies = [
+ "fastrand 2.4.1",
  "futures-core",
  "futures-io",
  "memchr",
@@ -1288,7 +1306,7 @@ name = "gltf"
 version = "1.0.0"
 source = "git+https://github.com/gltf-rs/gltf.git?rev=b9c04be69363b8353d58f99aa1008ead93020851#b9c04be69363b8353d58f99aa1008ead93020851"
 dependencies = [
- "base64 0.12.3",
+ "base64",
  "byteorder",
  "gltf-json",
  "image 0.24.1",
@@ -1476,7 +1494,7 @@ dependencies = [
  "cfg-if 1.0.4",
  "imgui-sys",
  "mint",
- "parking_lot 0.12.5",
+ "parking_lot",
 ]
 
 [[package]]
@@ -1695,7 +1713,7 @@ dependencies = [
  "log",
  "memmap2 0.2.3",
  "ngx_dlss",
- "parking_lot 0.11.2",
+ "parking_lot",
  "radiant",
  "rust-shaders-shared",
  "smol",
@@ -1708,7 +1726,7 @@ name = "kajiya-asset"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "base64 0.12.3",
+ "base64",
  "byteorder",
  "bytes",
  "ddsfile",
@@ -1762,7 +1780,7 @@ dependencies = [
  "log",
  "nanoserde",
  "normpath",
- "parking_lot 0.11.2",
+ "parking_lot",
  "puffin",
  "raw-window-handle",
  "relative-path",
@@ -1784,7 +1802,7 @@ dependencies = [
  "imgui-winit-support",
  "kajiya",
  "log",
- "parking_lot 0.11.2",
+ "parking_lot",
  "winit",
 ]
 
@@ -1796,7 +1814,7 @@ dependencies = [
  "arrayvec 0.5.2",
  "kajiya-backend",
  "log",
- "parking_lot 0.11.2",
+ "parking_lot",
  "puffin",
  "turbosloth",
 ]
@@ -2162,11 +2180,11 @@ dependencies = [
 
 [[package]]
 name = "normpath"
-version = "0.3.1"
+version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "640c20e9df4a2d4a5adad5b47e17d76dac3e824346b181931c3ec9f7a85687b1"
+checksum = "b9985ef7269fa99f3b12437bb698381da2428743ab90f20393f399fa14cab21a"
 dependencies = [
- "winapi 0.3.9",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -2565,37 +2583,12 @@ checksum = "427c3892f9e783d91cc128285287e70a59e206ca452770ece88a76f7a3eddd72"
 
 [[package]]
 name = "parking_lot"
-version = "0.11.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d17b78036a60663b797adeaee46f5c9dfebb86948d1255007a1d6be0271ff99"
-dependencies = [
- "instant",
- "lock_api",
- "parking_lot_core 0.8.5",
-]
-
-[[package]]
-name = "parking_lot"
 version = "0.12.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93857453250e3077bd71ff98b6a65ea6621a19bb0f559a85248955ac12c45a1a"
 dependencies = [
  "lock_api",
- "parking_lot_core 0.9.12",
-]
-
-[[package]]
-name = "parking_lot_core"
-version = "0.8.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d76e8e1493bcac0d2766c42737f34458f1c8c50c0d23bcb24ea953affb273216"
-dependencies = [
- "cfg-if 1.0.4",
- "instant",
- "libc",
- "redox_syscall 0.2.10",
- "smallvec",
- "winapi 0.3.9",
+ "parking_lot_core",
 ]
 
 [[package]]
@@ -2791,7 +2784,7 @@ dependencies = [
  "cfg-if 1.0.4",
  "itertools",
  "lz4_flex",
- "parking_lot 0.12.5",
+ "parking_lot",
  "serde",
 ]
 
@@ -2804,7 +2797,7 @@ dependencies = [
  "anyhow",
  "crossbeam-channel",
  "log",
- "parking_lot 0.12.5",
+ "parking_lot",
  "puffin",
 ]
 
@@ -2939,13 +2932,16 @@ checksum = "f9629de8974fd69c97684736786b807edd3da456d3e3f95341dd9d4cbd8f5ad6"
 
 [[package]]
 name = "ron"
-version = "0.6.6"
+version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86018df177b1beef6c7c8ef949969c4f7cb9a9344181b92486b23c79995bdaa4"
+checksum = "4147b952f3f819eca0e99527022f7d6a8d05f111aeb0a62960c74eb283bec8fc"
 dependencies = [
- "base64 0.13.0",
- "bitflags 1.3.2",
+ "bitflags 2.11.1",
+ "once_cell",
  "serde",
+ "serde_derive",
+ "typeid",
+ "unicode-ident",
 ]
 
 [[package]]
@@ -3259,7 +3255,7 @@ dependencies = [
  "async-net",
  "async-process",
  "blocking",
- "futures-lite",
+ "futures-lite 1.12.0",
  "once_cell",
 ]
 
@@ -3582,9 +3578,15 @@ version = "0.2.0"
 source = "git+https://github.com/h3r2tic/turbosloth.git?rev=92030af#92030af160fe7dcf4089fe728e8990b7eafe82fb"
 dependencies = [
  "async-trait",
- "futures-lite",
+ "futures-lite 1.12.0",
  "wyhash",
 ]
+
+[[package]]
+name = "typeid"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc7d623258602320d5c55d1bc22793b57daff0ec7efc270ea7d55ce1d5f5471c"
 
 [[package]]
 name = "unicode-ident"
