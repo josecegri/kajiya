@@ -217,7 +217,7 @@ impl RuntimeState {
         }
 
         let input = self.movement_map.map(&self.keyboard, ctx.dt_filtered);
-        let move_vec = self.camera.final_transform.rotation
+        let move_vec = Quat::from(self.camera.final_transform.rotation)
             * Vec3::new(input["move_right"], input["move_up"], -input["move_fwd"])
                 .clamp_length_max(1.0)
             * 4.0f32.powf(input["boost"]);
@@ -254,12 +254,14 @@ impl RuntimeState {
             }
 
             if let Some(value) = sequence.sample(t.max(0.0)) {
-                self.camera.driver_mut::<Position>().position = value.camera_position;
+                self.camera.driver_mut::<Position>().position = value.camera_position.into();
                 self.camera
                     .driver_mut::<YawPitch>()
-                    .set_rotation_quat(dolly::util::look_at::<dolly::handedness::RightHanded>(
-                        value.camera_direction,
-                    ));
+                    .set_rotation_quat(dolly::util::look_at::<
+                        dolly::handedness::RightHanded,
+                        kajiya_simple::Vec3,
+                        kajiya_simple::Quat,
+                    >(value.camera_direction));
                 persisted
                     .light
                     .sun
@@ -274,8 +276,8 @@ impl RuntimeState {
 
         self.camera.update(ctx.dt_filtered);
 
-        persisted.camera.position = self.camera.final_transform.position;
-        persisted.camera.rotation = self.camera.final_transform.rotation;
+        persisted.camera.position = self.camera.final_transform.position.into();
+        persisted.camera.rotation = self.camera.final_transform.rotation.into();
 
         if self
             .keyboard
@@ -563,10 +565,15 @@ impl RuntimeState {
             self.camera.driver_mut::<Position>().position = exact_item
                 .value
                 .camera_position
-                .unwrap_or(value.camera_position);
+                .unwrap_or(value.camera_position)
+                .into();
             self.camera
                 .driver_mut::<YawPitch>()
-                .set_rotation_quat(dolly::util::look_at::<dolly::handedness::RightHanded>(
+                .set_rotation_quat(dolly::util::look_at::<
+                    dolly::handedness::RightHanded,
+                    kajiya_simple::Vec3,
+                    kajiya_simple::Quat,
+                >(
                     exact_item
                         .value
                         .camera_direction

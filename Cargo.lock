@@ -903,11 +903,11 @@ dependencies = [
 
 [[package]]
 name = "dolly"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8bd01a2e160b741ea8fe693264718dda9e75a85e3fd38269b97e76361077f11"
+version = "0.6.0"
+source = "git+https://github.com/josecegri/dolly.git#126e17574325d2f31d619f08779d4daad1d5e3d2"
 dependencies = [
- "glam 0.22.0",
+ "glam 0.30.10",
+ "mint",
 ]
 
 [[package]]
@@ -1259,21 +1259,22 @@ checksum = "f0a01e0497841a3b2db4f8afa483cce65f7e96a3498bd6c541734792aeac8fe7"
 
 [[package]]
 name = "glam"
-version = "0.22.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12f597d56c1bd55a811a1be189459e8fad2bbc272616375602443bdfb37fa774"
-dependencies = [
- "num-traits 0.2.16",
- "serde",
-]
-
-[[package]]
-name = "glam"
 version = "0.24.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42218cb640844e3872cc3c153dc975229e080a6c4733b34709ef445610550226"
 dependencies = [
  "libm",
+]
+
+[[package]]
+name = "glam"
+version = "0.30.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "19fc433e8437a212d1b6f1e68c7824af3aed907da60afa994e7f542d18d12aa9"
+dependencies = [
+ "libm",
+ "mint",
+ "serde_core",
 ]
 
 [[package]]
@@ -1685,7 +1686,7 @@ dependencies = [
  "easy-parallel",
  "exr",
  "fern",
- "glam 0.22.0",
+ "glam 0.30.10",
  "half",
  "image 0.23.14",
  "kajiya-asset",
@@ -1711,7 +1712,7 @@ dependencies = [
  "byteorder",
  "bytes",
  "ddsfile",
- "glam 0.22.0",
+ "glam 0.30.10",
  "gltf",
  "image 0.23.14",
  "intel_tex_2",
@@ -1732,7 +1733,7 @@ dependencies = [
  "easy-parallel",
  "env_logger",
  "futures",
- "glam 0.22.0",
+ "glam 0.30.10",
  "kajiya-asset",
  "log",
  "num_cpus",
@@ -1753,7 +1754,7 @@ dependencies = [
  "bytes",
  "derive_builder",
  "futures",
- "glam 0.22.0",
+ "glam 0.30.10",
  "gpu-allocator",
  "gpu-profiler",
  "hassle-rs",
@@ -1805,7 +1806,7 @@ name = "kajiya-simple"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "glam 0.22.0",
+ "glam 0.30.10",
  "imgui",
  "kajiya",
  "kajiya-imgui",
@@ -1923,11 +1924,11 @@ checksum = "7ef0d4ed8669f8f8826eb00dc878084aa8f253506c4fd5e8f58f5bce72ddb97e"
 
 [[package]]
 name = "macaw"
-version = "0.18.6"
+version = "0.30.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8fdbfdf07a7e53090afb7fd427eb0a4b46fc51cb484b2deba27b47919762dfb"
+checksum = "4c96b82556b0d4aa25cd4771b64ef9bde7c120afb588a083fcb242bf01e4a09b"
 dependencies = [
- "glam 0.22.0",
+ "glam 0.30.10",
  "num-traits 0.2.16",
 ]
 
@@ -1976,9 +1977,9 @@ dependencies = [
 [[package]]
 name = "mikktspace"
 version = "0.2.0"
-source = "git+https://github.com/h3r2tic/mikktspace.git?branch=master#f2d0412b91de385861664e54951ae7dcaaf63f2d"
+source = "git+https://github.com/josecegri/mikktspace.git?branch=master#19a5a9ef3ed00064a8c1470ab635b7302d64860f"
 dependencies = [
- "glam 0.24.1",
+ "glam 0.30.10",
 ]
 
 [[package]]
@@ -2981,7 +2982,7 @@ dependencies = [
 name = "rust-shaders-shared"
 version = "0.1.0"
 dependencies = [
- "glam 0.22.0",
+ "glam 0.30.10",
  "macaw",
  "num-traits 0.2.16",
  "spirv-std",
@@ -3329,11 +3330,11 @@ source = "git+https://github.com/EmbarkStudios/rust-gpu?rev=e87c324bfda6bea144fe
 
 [[package]]
 name = "splines"
-version = "4.2.0"
+version = "5.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "345f11dca845086e60f1076569dedb4c2026e8dfe420d2900de8683142480bcf"
+checksum = "b882be9bf6b37258bfba80ed5b5eeccccd6700bfbaca202bbd53e4c13bf3daa7"
 dependencies = [
- "glam 0.22.0",
+ "glam 0.30.10",
 ]
 
 [[package]]

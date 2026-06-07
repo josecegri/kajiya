@@ -15,7 +15,7 @@ byte-slice-cast = "0.3"
 bytes = "1.0"
 derive_builder = { version = "0.9", default-features = false }
 futures = "0.3"
-glam = "0.22"
+glam = "0.30"
 gpu-allocator = "0.28.0"
 gpu-profiler = { git = "https://github.com/josecegri/gpu-profiler.git", features = ["use-ash"] }
 hassle-rs = "0.12.0"
