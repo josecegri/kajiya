@@ -12,8 +12,8 @@ ash = { version = "0.38.0", default-features = false, features = ["linked"]}
 ash-window = "0.13.0"
 backtrace = "0.3.7"
 byte-slice-cast = "1.2.3"
-bytes = "1.0"
-derive_builder = { version = "0.9", default-features = false }
+bytes = "1.11.1"
+derive_builder = "0.20.2"
 futures = "0.3.3"
 glam = "0.30"
 gpu-allocator = "0.28.0"
