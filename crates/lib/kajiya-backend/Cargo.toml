@@ -11,10 +11,10 @@ arrayvec = "0.7.6"
 ash = { version = "0.38.0", default-features = false, features = ["linked"]}
 ash-window = "0.13.0"
 backtrace = "0.3.7"
-byte-slice-cast = "0.3"
+byte-slice-cast = "1.2.3"
 bytes = "1.0"
 derive_builder = { version = "0.9", default-features = false }
-futures = "0.3"
+futures = "0.3.3"
 glam = "0.30"
 gpu-allocator = "0.28.0"
 gpu-profiler = { git = "https://github.com/josecegri/gpu-profiler.git", features = ["use-ash"] }

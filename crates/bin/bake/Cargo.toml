@@ -11,4 +11,4 @@ kajiya-asset-pipe = { path = "../../lib/kajiya-asset-pipe" }
 
 env_logger = "0.11.1"
 anyhow = "1.0"
-structopt = "0.3"
+structopt = "0.3.2"
