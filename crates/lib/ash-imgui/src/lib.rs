@@ -4,7 +4,6 @@
 use arrayvec::ArrayVec;
 use ash::{Device, vk};
 use imgui::{Context, DrawCmd, DrawCmdParams, DrawData, DrawIdx, DrawVert, internal::RawWrapper};
-use memoffset::offset_of;
 use std::{
     mem,
     os::raw::{c_uchar, c_void},
@@ -470,19 +469,19 @@ impl Renderer {
                     location: 0,
                     binding: 0,
                     format: vk::Format::R32G32_SFLOAT,
-                    offset: offset_of!(DrawVert, pos) as u32,
+                    offset: mem::offset_of!(DrawVert, pos) as u32,
                 },
                 vk::VertexInputAttributeDescription {
                     location: 1,
                     binding: 0,
                     format: vk::Format::R32G32_SFLOAT,
-                    offset: offset_of!(DrawVert, uv) as u32,
+                    offset: mem::offset_of!(DrawVert, uv) as u32,
                 },
                 vk::VertexInputAttributeDescription {
                     location: 2,
                     binding: 0,
                     format: vk::Format::R8G8B8A8_UNORM,
-                    offset: offset_of!(DrawVert, col) as u32,
+                    offset: mem::offset_of!(DrawVert, col) as u32,
                 },
             ];
 
