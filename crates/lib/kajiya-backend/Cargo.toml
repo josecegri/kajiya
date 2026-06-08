@@ -29,7 +29,7 @@ raw-window-handle = "0.6.2"
 relative-path = "2.0.1"
 rspirv = "0.13.0"
 rspirv-reflect = "0.9.0"
-shader-prepper = "0.3.0-pre.1"
+shader-prepper = "0.3.0-pre.3"
 smol = "2.0.2"
 thiserror = "1.0"
 turbosloth = { git = "https://github.com/h3r2tic/turbosloth.git", rev = "92030af" }
