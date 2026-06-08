@@ -327,7 +327,7 @@ impl<'a, 'exec_params, 'constants> RenderPassApi<'a, 'exec_params, 'constants> {
 
         // Bind images to the imageless framebuffer
         let image_attachments: Result<
-            ArrayVec<[vk::ImageView; MAX_COLOR_ATTACHMENTS + 1]>,
+            ArrayVec<vk::ImageView, { MAX_COLOR_ATTACHMENTS + 1 }>,
             BackendError,
         > = color_attachments
             .iter()

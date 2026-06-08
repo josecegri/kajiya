@@ -12,7 +12,7 @@ kajiya-rg = { path = "../kajiya-rg" }
 rust-shaders-shared = { path = "../rust-shaders-shared" }
 
 anyhow = "1.0"
-array-init = "2.0.0"
+array-init = "2.1.0"
 blue-noise-sampler = "0.1"
 bytemuck = "1.9.1"
 chrono = "0.4.45"

@@ -8,4 +8,4 @@ publish = false
 [dependencies]
 ash = "0.38.0"
 imgui = "0.12.0"
-arrayvec = "0.5"
+arrayvec = "0.7.6"

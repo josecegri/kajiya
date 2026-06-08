@@ -9,7 +9,7 @@ edition = "2024"
 kajiya-backend = { path = "../kajiya-backend" }
 
 anyhow = "1.0"
-arrayvec = "0.5"
+arrayvec = "0.7.6"
 log = "0.4"
 parking_lot = "0.12.5"
 puffin = "0.20.0"

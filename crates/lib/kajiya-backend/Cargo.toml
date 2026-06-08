@@ -7,10 +7,10 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0"
-arrayvec = "0.5"
+arrayvec = "0.7.6"
 ash = { version = "0.38.0", default-features = false, features = ["linked"]}
 ash-window = "0.13.0"
-backtrace = "0.3"
+backtrace = "0.3.7"
 byte-slice-cast = "0.3"
 bytes = "1.0"
 derive_builder = { version = "0.9", default-features = false }
