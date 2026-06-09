@@ -11,7 +11,7 @@ kajiya-imgui = { path = "../kajiya-imgui", optional = true }
 
 anyhow = "1.0.102"
 glam = { version = "0.30", features = ["serde"] }
-log = "0.4"
+log = "0.4.32"
 puffin = { version = "0.20.0" }
 turbosloth = { git = "https://github.com/h3r2tic/turbosloth.git", rev = "92030af" }
 winit = { version = "0.30.13", features = ["rwh_06"] }

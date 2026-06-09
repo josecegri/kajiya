@@ -11,6 +11,6 @@ kajiya = { path = "../kajiya" }
 ash-imgui = { path = "../ash-imgui" }
 imgui = "0.12.0"
 imgui-winit-support = "0.13.0"
-log = "0.4"
+log = "0.4.32"
 parking_lot = "0.12.5"
 winit = { version = "0.30.13", features = ["rwh_06"] }

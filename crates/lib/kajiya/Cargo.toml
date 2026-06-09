@@ -21,7 +21,7 @@ fern = { version = "0.7.1", features = ["colored"] }
 glam = "0.30"
 half = { version = "2.7.1", features = ["bytemuck"] }
 image = { version = "0.25.10", default-features = false, features = ["gif", "jpeg", "ico", "png", "pnm", "tga", "tiff", "webp", "bmp", "hdr"] }
-log = "0.4"
+log = "0.4.32"
 memmap2 = "0.9.10"
 parking_lot = "0.12.5"
 radiant = "0.3"
