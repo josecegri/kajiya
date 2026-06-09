@@ -9,6 +9,6 @@ edition = "2024"
 kajiya-asset = { path = "../../lib/kajiya-asset" }
 kajiya-asset-pipe = { path = "../../lib/kajiya-asset-pipe" }
 
-env_logger = "0.8.4"
-anyhow = "1.0"
-structopt = "0.3"
+env_logger = "0.11.1"
+anyhow = "1.0.102"
+structopt = "0.3.26"

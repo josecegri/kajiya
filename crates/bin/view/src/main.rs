@@ -113,7 +113,8 @@ fn main() -> anyhow::Result<()> {
 
     let state = state.run()?;
 
-    ron::ser::to_writer_pretty(
+    let ron = ron::options::Options::default();
+    ron.to_io_writer_pretty(
         File::create(APP_STATE_CONFIG_FILE_PATH)?,
         &state,
         Default::default(),

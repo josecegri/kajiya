@@ -7,6 +7,6 @@ edition = "2024"
 
 [dependencies]
 plotters = "0.3"
-image = "0.23"
+image = "0.25.10"
 
 [workspace]

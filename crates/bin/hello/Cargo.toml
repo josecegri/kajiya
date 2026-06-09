@@ -8,4 +8,4 @@ edition = "2024"
 [dependencies]
 kajiya = { path = "../../lib/kajiya" }
 kajiya-simple = { path = "../../lib/kajiya-simple" }
-anyhow = "1.0"
+anyhow = "1.0.102"

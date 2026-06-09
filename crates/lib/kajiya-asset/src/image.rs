@@ -174,18 +174,18 @@ impl CreateGpuImage {
 
             let block_bytes = bc_mode.block_bytes();
 
-            let surface = intel_tex_2::RgbaSurface {
-                width: mip.width(),
-                height: mip.height(),
-                stride: mip.width() * 4,
-                data: &mip,
-            };
-
             let mut compressed_bytes = vec![0u8; block_count as usize * block_bytes];
 
             log::info!("Compressing to {:?}...", bc_mode);
             match bc_mode {
                 BcMode::Bc5 => {
+                    let surface = intel_tex_2::RgSurface {
+                        width: mip.width(),
+                        height: mip.height(),
+                        stride: mip.width() * 4,
+                        data: &mip,
+                    };
+
                     format = match self.params.gamma {
                         crate::mesh::TexGamma::Linear => vk::Format::BC5_UNORM_BLOCK,
                         crate::mesh::TexGamma::Srgb => unimplemented!(),
@@ -194,6 +194,13 @@ impl CreateGpuImage {
                     bc5::compress_blocks_into(&surface, &mut compressed_bytes)
                 }
                 BcMode::Bc7 => {
+                    let surface = intel_tex_2::RgbaSurface {
+                        width: mip.width(),
+                        height: mip.height(),
+                        stride: mip.width() * 4,
+                        data: &mip,
+                    };
+
                     format = match self.params.gamma {
                         crate::mesh::TexGamma::Linear => vk::Format::BC7_UNORM_BLOCK,
                         crate::mesh::TexGamma::Srgb => vk::Format::BC7_SRGB_BLOCK,

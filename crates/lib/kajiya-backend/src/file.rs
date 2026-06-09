@@ -1,6 +1,6 @@
 use anyhow::Context as _;
 use bytes::Bytes;
-use hotwatch::Hotwatch;
+use hotwatch::{EventKind, Hotwatch};
 use normpath::PathExt;
 use parking_lot::Mutex;
 use std::{collections::HashMap, fs::File, path::PathBuf, sync::LazyLock};
@@ -125,7 +125,7 @@ impl LazyWorker for LoadFile {
         FILE_WATCHER
             .lock()
             .watch(self.path.clone(), move |event| {
-                if matches!(event, hotwatch::Event::Write(_)) {
+                if matches!(event.kind, EventKind::Modify(_)) {
                     invalidation_trigger();
                 }
             })

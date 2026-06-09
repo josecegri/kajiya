@@ -63,7 +63,12 @@ pub fn process_mesh_asset(opt: MeshAssetProcessParams) -> Result<()> {
                     if img_dst.exists() {
                         log::info!("Could not create {:?}; ignoring", img_dst);
                     } else {
-                        anyhow::anyhow!(err);
+                        log::warn!(
+                            "Could not load image {:?}, reason {}; ignoring",
+                            err,
+                            img_dst.display()
+                        );
+                        let _ = anyhow::anyhow!(err);
                     }
                 }
             };

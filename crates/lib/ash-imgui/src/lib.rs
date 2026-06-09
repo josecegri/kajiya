@@ -4,7 +4,6 @@
 use arrayvec::ArrayVec;
 use ash::{Device, vk};
 use imgui::{Context, DrawCmd, DrawCmdParams, DrawData, DrawIdx, DrawVert, internal::RawWrapper};
-use memoffset::offset_of;
 use std::{
     mem,
     os::raw::{c_uchar, c_void},
@@ -122,8 +121,8 @@ impl Renderer {
                 usage: vk::BufferUsageFlags::VERTEX_BUFFER,
                 ..Default::default()
             };
-            let mut buffers = ArrayVec::<[vk::Buffer; Renderer::FRAME_COUNT]>::new();
-            let mut mem_offsets = ArrayVec::<[usize; Renderer::FRAME_COUNT]>::new();
+            let mut buffers = ArrayVec::<vk::Buffer, { Renderer::FRAME_COUNT }>::new();
+            let mut mem_offsets = ArrayVec::<usize, { Renderer::FRAME_COUNT }>::new();
             for _i in 0..Renderer::FRAME_COUNT {
                 let buffer = unsafe { device.create_buffer(&buffer_create_info, None) }.unwrap();
                 let mem_req = unsafe { device.get_buffer_memory_requirements(buffer) };
@@ -147,8 +146,8 @@ impl Renderer {
                 usage: vk::BufferUsageFlags::INDEX_BUFFER,
                 ..Default::default()
             };
-            let mut buffers = ArrayVec::<[vk::Buffer; Renderer::FRAME_COUNT]>::new();
-            let mut mem_offsets = ArrayVec::<[usize; Renderer::FRAME_COUNT]>::new();
+            let mut buffers = ArrayVec::<vk::Buffer, { Renderer::FRAME_COUNT }>::new();
+            let mut mem_offsets = ArrayVec::<usize, { Renderer::FRAME_COUNT }>::new();
             for _i in 0..Renderer::FRAME_COUNT {
                 let buffer = unsafe { device.create_buffer(&buffer_create_info, None) }.unwrap();
                 let mem_req = unsafe { device.get_buffer_memory_requirements(buffer) };
@@ -470,19 +469,19 @@ impl Renderer {
                     location: 0,
                     binding: 0,
                     format: vk::Format::R32G32_SFLOAT,
-                    offset: offset_of!(DrawVert, pos) as u32,
+                    offset: mem::offset_of!(DrawVert, pos) as u32,
                 },
                 vk::VertexInputAttributeDescription {
                     location: 1,
                     binding: 0,
                     format: vk::Format::R32G32_SFLOAT,
-                    offset: offset_of!(DrawVert, uv) as u32,
+                    offset: mem::offset_of!(DrawVert, uv) as u32,
                 },
                 vk::VertexInputAttributeDescription {
                     location: 2,
                     binding: 0,
                     format: vk::Format::R8G8B8A8_UNORM,
-                    offset: offset_of!(DrawVert, col) as u32,
+                    offset: mem::offset_of!(DrawVert, col) as u32,
                 },
             ];
 

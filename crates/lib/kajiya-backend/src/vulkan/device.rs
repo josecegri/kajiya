@@ -246,14 +246,14 @@ impl Device {
             // DLSS
             #[cfg(feature = "dlss")]
             {
-                b"VK_NVX_binary_import\0".as_ptr() as *const i8
+                c"VK_NVX_binary_import".as_ptr()
             },
             #[cfg(feature = "dlss")]
             {
-                b"VK_KHR_push_descriptor\0".as_ptr() as *const i8
+                c"VK_KHR_push_descriptor".as_ptr()
             },
             #[cfg(feature = "dlss")]
-            vk::NvxImageViewHandleFn::name().as_ptr(),
+            vk::NVX_IMAGE_VIEW_HANDLE_NAME.as_ptr(),
         ];
 
         let ray_tracing_extensions = [
