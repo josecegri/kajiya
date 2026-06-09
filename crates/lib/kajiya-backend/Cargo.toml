@@ -14,7 +14,7 @@ backtrace = "0.3.7"
 byte-slice-cast = "1.2.3"
 bytes = "1.11.1"
 derive_builder = "0.20.2"
-futures = "0.3.3"
+futures = "0.3.32"
 glam = "0.30"
 gpu-allocator = "0.28.0"
 gpu-profiler = { git = "https://github.com/josecegri/gpu-profiler.git", features = ["use-ash"] }
