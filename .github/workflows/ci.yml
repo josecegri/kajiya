@@ -51,7 +51,12 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libvulkan-dev vulkan-tools mesa-vulkan-drivers
+          sudo apt-get install -y libvulkan-dev mesa-vulkan-drivers
+
+      - name: Install Vulkan (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install vulkan-sdk -y
 
       - name: Build tests
         run: cargo test --no-run
