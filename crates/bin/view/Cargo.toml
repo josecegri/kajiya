@@ -10,7 +10,7 @@ kajiya = { path = "../../lib/kajiya" }
 kajiya-simple = { path = "../../lib/kajiya-simple", features = ["dear-imgui", "winit_serde"] }
 kajiya-asset-pipe = { path = "../../lib/kajiya-asset-pipe"}
 
-anyhow = "1.0"
+anyhow = "1.0.102"
 dolly = { git = "https://github.com/josecegri/dolly.git" }
 imgui = "0.12.0"
 log = "0.4"
@@ -18,7 +18,7 @@ ron = "0.12.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_plain = "1.0.2"
 structopt = "0.3.26"
-toml = "0.7.2"
+toml = "1.1.2"
 splines = { version = "5.0.0", features = ["glam"] }
 
 [features]

@@ -1,5 +1,6 @@
 use crate::{file::LoadFile, normalized_path_from_vfs, shader_compiler::CompiledShader};
 use anyhow::{Context, Result};
+use hotwatch::EventKind;
 use nanoserde::DeJson;
 use parking_lot::Mutex;
 use std::{process::Command, sync::LazyLock};
@@ -124,7 +125,7 @@ impl LazyWorker for CompileRustShaderCrate {
             crate::file::FILE_WATCHER
                 .lock()
                 .watch(src_dir.clone(), move |event| {
-                    if matches!(event, hotwatch::Event::Write(_)) {
+                    if matches!(event.kind, EventKind::Modify(_)) {
                         invalidation_trigger();
                     }
                 })

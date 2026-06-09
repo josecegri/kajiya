@@ -8,7 +8,7 @@ edition = "2024"
 [dependencies]
 kajiya-asset = { path = "../kajiya-asset" }
 
-anyhow = "1.0"
+anyhow = "1.0.102"
 async-channel = "2.5.0"
 async-executor = "1.14.0"
 easy-parallel = "3.3.1"

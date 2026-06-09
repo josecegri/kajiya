@@ -11,7 +11,7 @@ kajiya-backend = { path = "../kajiya-backend" }
 kajiya-rg = { path = "../kajiya-rg" }
 rust-shaders-shared = { path = "../rust-shaders-shared" }
 
-anyhow = "1.0"
+anyhow = "1.0.102"
 array-init = "2.1.0"
 blue-noise-sampler = "0.1"
 bytemuck = "1.9.1"

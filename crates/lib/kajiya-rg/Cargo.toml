@@ -8,7 +8,7 @@ edition = "2024"
 [dependencies]
 kajiya-backend = { path = "../kajiya-backend" }
 
-anyhow = "1.0"
+anyhow = "1.0.102"
 arrayvec = "0.7.6"
 log = "0.4"
 parking_lot = "0.12.5"

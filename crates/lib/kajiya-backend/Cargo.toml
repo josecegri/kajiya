@@ -6,7 +6,7 @@ edition = "2024"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0"
+anyhow = "1.0.102"
 arrayvec = "0.7.6"
 ash = { version = "0.38.0", default-features = false, features = ["linked"]}
 ash-window = "0.13.0"
@@ -19,7 +19,7 @@ glam = "0.30"
 gpu-allocator = "0.28.0"
 gpu-profiler = { git = "https://github.com/josecegri/gpu-profiler.git", features = ["use-ash"] }
 hassle-rs = "0.12.0"
-hotwatch = "0.4"
+hotwatch = "0.5.0"
 log = "0.4"
 nanoserde = "0.2.1"
 normpath = "1.5.1"
@@ -31,7 +31,7 @@ rspirv = "0.13.0"
 rspirv-reflect = "0.9.0"
 shader-prepper = "0.3.0-pre.3"
 smol = "2.0.2"
-thiserror = "1.0"
+thiserror = "2.0.1"
 turbosloth = { git = "https://github.com/h3r2tic/turbosloth.git", rev = "92030af" }
 vk-sync = { git = "https://github.com/josecegri/vk-sync-rs", rev = "911eb21219c192e3be241fcbe716efd0adaaff33" }
 
