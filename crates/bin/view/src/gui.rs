@@ -329,8 +329,7 @@ impl RuntimeState {
 
                         ui.same_line();
                         ui.set_next_item_width(60.0);
-                        #[allow(deprecated)]
-                        imgui::InputFloat::new(ui, &format!("duration##{}", i), &mut item.duration)
+                        ui.input_float(&format!("duration##{}", i), &mut item.duration)
                             .build();
 
                         ui.same_line();

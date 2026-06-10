@@ -88,13 +88,15 @@ impl Sequence {
     }
 
     pub fn to_playback(&self) -> CameraPlaybackSequence {
+        // TODO: updated for now from Catmull-Rom interpolating spline to Linear, as the sequencer was behaving inconsistently
         CameraPlaybackSequence {
             duration: self.items.last().map_or(0.0, |item| item.t),
             camera_position_spline: splines::Spline::from_iter(self.items.iter().filter_map(|k| {
                 Some(splines::Key::new(
                     k.t,
                     k.value.camera_position.as_option()?,
-                    splines::Interpolation::CatmullRom,
+                    // splines::Interpolation::CatmullRom,
+                    splines::Interpolation::Linear,
                 ))
             })),
             camera_direction_spline: splines::Spline::from_iter(self.items.iter().filter_map(
@@ -102,7 +104,8 @@ impl Sequence {
                     Some(splines::Key::new(
                         k.t,
                         k.value.camera_direction.as_option()?,
-                        splines::Interpolation::CatmullRom,
+                        // splines::Interpolation::CatmullRom,
+                        splines::Interpolation::Linear,
                     ))
                 },
             )),
@@ -110,7 +113,8 @@ impl Sequence {
                 Some(splines::Key::new(
                     k.t,
                     k.value.towards_sun.as_option()?,
-                    splines::Interpolation::CatmullRom,
+                    // splines::Interpolation::CatmullRom,
+                    splines::Interpolation::Linear,
                 ))
             })),
         }
