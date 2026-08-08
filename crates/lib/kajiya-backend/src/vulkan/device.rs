@@ -217,7 +217,7 @@ impl Device {
                 .instance
                 .raw
                 .enumerate_device_extension_properties(pdevice.raw)?;
-            debug!("Extension properties:\n{:#?}", &extension_properties);
+            debug!("Extension properties:\n{:#?}", extension_properties);
 
             extension_properties
                 .iter()
@@ -357,12 +357,12 @@ impl Device {
 
                 (instance.fp_v1_1().get_physical_device_features2)(pdevice.raw, &mut features2);
 
-                debug!("{:#?}", &scalar_block);
-                debug!("{:#?}", &descriptor_indexing);
-                debug!("{:#?}", &imageless_framebuffer);
-                debug!("{:#?}", &shader_float16_int8);
-                debug!("{:#?}", &vulkan_memory_model);
-                debug!("{:#?}", &get_buffer_device_address_features);
+                debug!("{:#?}", scalar_block);
+                debug!("{:#?}", descriptor_indexing);
+                debug!("{:#?}", imageless_framebuffer);
+                debug!("{:#?}", shader_float16_int8);
+                debug!("{:#?}", vulkan_memory_model);
+                debug!("{:#?}", get_buffer_device_address_features);
 
                 // The suggested `#[rustfmt::skip]` is not stable
                 #[allow(clippy::deprecated_cfg_attr)]
