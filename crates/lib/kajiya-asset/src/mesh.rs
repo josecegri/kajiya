@@ -458,10 +458,6 @@ fn pack_unit_direction_11_10_11(x: f32, y: f32, z: f32) -> u32 {
     (z << 21) | (y << 11) | x
 }
 
-// TODO: there is a subtle problem as packed representation have fields alignment or 1, and code seems to be using
-//       references on potentially unaligned memory which can cause UB - I have not investigated this, but probably
-//       the reason of using packed representation is because is reading data from mmap'd resources -- a quick way
-//       that currently allow me to see the problem is commenting out this flag `-C opt-level=z` from `config.toml`
 #[repr(packed)]
 #[allow(clippy::repr_packed_without_abi)]
 pub struct FlatVec<T> {
@@ -720,7 +716,6 @@ macro_rules! def_asset {
                 )*
             }
 
-            // TODO: see comment above about packed representation hazard
             #[repr(packed)]
             #[allow(clippy::repr_packed_without_abi)]
             pub struct Flat {
