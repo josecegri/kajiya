@@ -1,6 +1,6 @@
 use anyhow::Context;
 use nanoserde::SerJson;
-use spirv_builder::{Capability, MetadataPrintout, ModuleResult, SpirvBuilder, SpirvMetadata};
+use spirv_builder::{Capability, ModuleResult, SpirvBuilder, SpirvMetadata};
 
 #[derive(SerJson)]
 struct RustShaderCompileResult {
@@ -10,16 +10,18 @@ struct RustShaderCompileResult {
 
 fn main() -> anyhow::Result<()> {
     let builder_root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
-    let compile_result = SpirvBuilder::new(builder_root.join("../../lib/rust-shaders/"), "spirv-unknown-vulkan1.1")
-        .deny_warnings(true)
-        .capability(Capability::StorageImageWriteWithoutFormat)
-        .capability(Capability::Int8)
-        .capability(Capability::RuntimeDescriptorArray)
-        .extension("SPV_EXT_descriptor_indexing")
-        .print_metadata(MetadataPrintout::None)
-        .multimodule(true)
-        .spirv_metadata(SpirvMetadata::NameVariables)
-        .build()?;
+    let compile_result = SpirvBuilder::new(
+        builder_root.join("../../lib/rust-shaders/"),
+        "spirv-unknown-vulkan1.2",
+    )
+    .deny_warnings(true)
+    .capability(Capability::StorageImageWriteWithoutFormat)
+    .capability(Capability::Int8)
+    .capability(Capability::RuntimeDescriptorArray)
+    .extension("SPV_EXT_descriptor_indexing")
+    .multimodule(true)
+    .spirv_metadata(SpirvMetadata::NameVariables)
+    .build()?;
 
     let target_spv_dir = builder_root.join("../../../assets/rust-shaders-compiled");
     std::fs::create_dir_all(&target_spv_dir).context("Creating the SPIR-V output directory")?;

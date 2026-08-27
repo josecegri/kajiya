@@ -1,4 +1,10 @@
-use macaw::{Mat2, UVec4, Vec2, Vec4};
+use glam::{Mat2, UVec4, Vec2, Vec3, Vec4};
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VertexPacked {
+    pub data0: Vec4,
+}
 
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -11,6 +17,30 @@ pub struct MeshDescriptor {
     pub vertex_tangent_offset: u32,
     pub mat_data_offset: u32,
     pub index_offset: u32,
+}
+
+#[derive(Clone, Copy)]
+pub struct Vertex {
+    pub position: Vec3,
+    pub normal: Vec3,
+}
+
+// TODO: nuke
+#[inline]
+pub fn unpack_unit_direction_11_10_11(pck: u32) -> Vec3 {
+    Vec3::new(
+        ((pck & ((1u32 << 11) - 1)) as f32) * (2.0 / ((1u32 << 11) - 1) as f32) - 1.0,
+        (((pck >> 11) & ((1u32 << 10) - 1)) as f32) * (2.0 / ((1u32 << 10) - 1) as f32) - 1.0,
+        ((pck >> 21) as f32) * (2.0 / ((1u32 << 11) - 1) as f32) - 1.0,
+    )
+}
+
+#[inline]
+pub fn unpack_vertex(p: VertexPacked) -> Vertex {
+    Vertex {
+        position: p.data0.truncate(),
+        normal: unpack_unit_direction_11_10_11(p.data0.w.to_bits()),
+    }
 }
 
 #[repr(C, align(16))]

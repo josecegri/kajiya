@@ -1,4 +1,6 @@
 use kajiya_simple::Vec3;
+// TODO: can remove this workaround if splines crate upgrades glam dependency
+use splines_glam::Vec3 as SplineVec3;
 
 #[derive(Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Sequence {
@@ -94,7 +96,7 @@ impl Sequence {
             camera_position_spline: splines::Spline::from_iter(self.items.iter().filter_map(|k| {
                 Some(splines::Key::new(
                     k.t,
-                    k.value.camera_position.as_option()?,
+                    SplineVec3::from_array(k.value.camera_position.as_option()?.to_array()),
                     // splines::Interpolation::CatmullRom,
                     splines::Interpolation::Linear,
                 ))
@@ -103,7 +105,7 @@ impl Sequence {
                 |k| {
                     Some(splines::Key::new(
                         k.t,
-                        k.value.camera_direction.as_option()?,
+                        SplineVec3::from_array(k.value.camera_direction.as_option()?.to_array()),
                         // splines::Interpolation::CatmullRom,
                         splines::Interpolation::Linear,
                     ))
@@ -112,7 +114,7 @@ impl Sequence {
             towards_sun_spline: splines::Spline::from_iter(self.items.iter().filter_map(|k| {
                 Some(splines::Key::new(
                     k.t,
-                    k.value.towards_sun.as_option()?,
+                    SplineVec3::from_array(k.value.towards_sun.as_option()?.to_array()),
                     // splines::Interpolation::CatmullRom,
                     splines::Interpolation::Linear,
                 ))
@@ -164,9 +166,9 @@ impl Sequence {
 
 pub struct CameraPlaybackSequence {
     duration: f32,
-    camera_position_spline: splines::Spline<f32, Vec3>,
-    camera_direction_spline: splines::Spline<f32, Vec3>,
-    towards_sun_spline: splines::Spline<f32, Vec3>,
+    camera_position_spline: splines::Spline<f32, SplineVec3>,
+    camera_direction_spline: splines::Spline<f32, SplineVec3>,
+    towards_sun_spline: splines::Spline<f32, SplineVec3>,
 }
 
 impl CameraPlaybackSequence {
@@ -175,14 +177,14 @@ impl CameraPlaybackSequence {
             return None;
         }
 
-        let camera_position = self.camera_position_spline.clamped_sample(t)?;
-        let camera_direction = self.camera_direction_spline.clamped_sample(t)?;
-        let towards_sun = self.towards_sun_spline.clamped_sample(t)?;
+        let camera_position = self.camera_position_spline.clamped_sample(t)?.to_array();
+        let camera_direction = self.camera_direction_spline.clamped_sample(t)?.to_array();
+        let towards_sun = self.towards_sun_spline.clamped_sample(t)?.to_array();
 
         Some(SequenceFullValue {
-            camera_position,
-            camera_direction,
-            towards_sun,
+            camera_position: Vec3::from_array(camera_position),
+            camera_direction: Vec3::from_array(camera_direction),
+            towards_sun: Vec3::from_array(towards_sun),
         })
     }
 }

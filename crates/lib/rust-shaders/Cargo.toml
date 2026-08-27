@@ -10,6 +10,8 @@ doctest = false
 
 [dependencies]
 rust-shaders-shared = { path = "../rust-shaders-shared" }
-spirv-std = { git = "https://github.com/EmbarkStudios/rust-gpu", rev = "e87c324bfda6bea144fe2635586281c4ef144f0d" }
-macaw = { version = "0.30.0", default-features = false, features = ["libm"] }
-glam = { version = "0.30", default-features = false, features = ["libm"] }
+spirv-std = { git = "https://github.com/Rust-GPU/rust-gpu", rev = "eb73c07837c31b4eca701237e04ef1a46432e57b" }
+glam = { version = "0.33.5", default-features = false, features = ["libm"] }
+
+[lints.rust]
+unexpected_cfgs = { level = "allow", check-cfg = ["cfg(spirv)"] }

@@ -361,6 +361,7 @@ impl SimpleMainLoop {
                     }
                     Event::WindowEvent { event, .. } => match event {
                         WindowEvent::CloseRequested => {
+                            // TODO: on window close, fix vulkan validation layers error: vkDestroySwapchainKHR(): can't be called on VkSwapchainKHR that is currently in use by VkQueue
                             elwt.exit();
                         }
                         WindowEvent::CursorMoved { .. } | WindowEvent::MouseInput { .. }

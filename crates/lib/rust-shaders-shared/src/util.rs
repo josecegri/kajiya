@@ -1,6 +1,5 @@
 use crate::frame_constants::FrameConstants;
-use glam::{Mat3, UVec2, UVec3, Vec2, Vec3, Vec3Swizzles, Vec4, Vec4Swizzles};
-use macaw::FloatExt;
+use glam::{FloatExt, Mat3, UVec2, UVec3, Vec2, Vec3, Vec3Swizzles, Vec4, Vec4Swizzles};
 #[cfg(target_arch = "spirv")]
 use spirv_std::num_traits::Float;
 
@@ -10,11 +9,7 @@ pub fn get_uv_u(pix: UVec2, tex_size: Vec4) -> Vec2 {
 
 // Replacement for abs due to SPIR-V codegen bug. See https://github.com/EmbarkStudios/rust-gpu/issues/468
 pub fn abs_f32(x: f32) -> f32 {
-    if x >= 0.0 {
-        x
-    } else {
-        -x
-    }
+    if x >= 0.0 { x } else { -x }
 }
 
 // For element `i` of `self`, return `v[i].abs()`
@@ -296,11 +291,7 @@ fn floor_log2_positive(x: f32) -> i32 {
 
 // workaround rust-gpu bug, will be fixed by #690
 fn mymax(a: i32, b: i32) -> i32 {
-    if a >= b {
-        a
-    } else {
-        b
-    }
+    if a >= b { a } else { b }
 }
 
 // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_texture_shared_exponent.txt

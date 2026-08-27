@@ -9,7 +9,7 @@
     "sourceLanguages": ["rust"],
     "request": "launch",
     "program": "$ZED_WORKTREE_ROOT/target/debug/view.exe",
-    "args": ["--width", "1600", "--height", "900"],
+    "args": ["--width", "1600", "--height", "900", "--graphics-debugging"],
     "cwd": "$ZED_WORKTREE_ROOT",
   },
   {

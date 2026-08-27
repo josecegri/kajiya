@@ -20,6 +20,8 @@ serde_plain = "1.0.2"
 structopt = "0.3.26"
 toml = "1.1.2"
 splines = { version = "5.0.0", features = ["glam"] }
+# TODO: can remove workaround if splines crate upgrades glam dependency
+splines_glam = { version = "0.30.10", package = "glam", features = ["serde"] }
 
 [features]
 dlss = ["kajiya/dlss"]
