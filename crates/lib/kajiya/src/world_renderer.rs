@@ -742,7 +742,7 @@ impl WorldRenderer {
                 .collect::<Vec<bool>>();
 
             let mut mesh_lights: Vec<TriangleLight> = Vec::new();
-            for indices in mesh.indices.as_slice().chunks_exact(3) {
+            for indices in mesh.indices.as_slice().as_chunks::<3>().0 {
                 let mat_idx = mesh.material_ids[indices[0] as usize] as usize;
                 if !emissive_materials[mat_idx] {
                     continue;

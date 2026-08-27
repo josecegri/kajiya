@@ -91,6 +91,7 @@ pub const CUBE_MAP_FACE_ROTATIONS: [Mat3; 6] = [
     Mat3::from_cols_array_2d(&[[-1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, 0.0, 1.0]]),  // front
 ];
 
+#[allow(clippy::manual_rotate)]
 pub fn radical_inverse_vdc(mut bits: u32) -> f32 {
     bits = (bits << 16) | (bits >> 16);
     bits = ((bits & 0x55555555) << 1) | ((bits & 0xAAAAAAAA) >> 1);
@@ -107,20 +108,21 @@ pub fn hammersley(i: u32, n: u32) -> Vec2 {
 // Building an Orthonormal Basis, Revisited
 // http://jcgt.org/published/0006/01/01/
 pub fn build_orthonormal_basis(n: Vec3) -> Mat3 {
-    let b1;
-    let b2;
-
-    if n.z < 0.0 {
+    let (b1, b2) = if n.z < 0.0 {
         let a = 1.0 / (1.0 - n.z);
         let b = n.x * n.y * a;
-        b1 = Vec3::new(1.0 - n.x * n.x * a, -b, n.x);
-        b2 = Vec3::new(b, n.y * n.y * a - 1.0, -n.y);
+        (
+            Vec3::new(1.0 - n.x * n.x * a, -b, n.x),
+            Vec3::new(b, n.y * n.y * a - 1.0, -n.y),
+        )
     } else {
         let a = 1.0 / (1.0 + n.z);
         let b = -n.x * n.y * a;
-        b1 = Vec3::new(1.0 - n.x * n.x * a, b, -n.x);
-        b2 = Vec3::new(b, 1.0 - n.y * n.y * a, -n.y);
-    }
+        (
+            Vec3::new(1.0 - n.x * n.x * a, b, -n.x),
+            Vec3::new(b, 1.0 - n.y * n.y * a, -n.y),
+        )
+    };
 
     Mat3::from_cols(b1, b2, n)
 }
@@ -196,6 +198,7 @@ pub fn unpack_unit_direction_11_10_11(pck: u32) -> Vec3 {
     )
 }
 
+#[allow(clippy::manual_clamp)]
 pub fn pack_unit_direction_11_10_11(x: f32, y: f32, z: f32) -> u32 {
     let x = (x.max(-1.0).min(1.0).mul_add(0.5, 0.5) * ((1u32 << 11u32) - 1u32) as f32) as u32;
     let y = (y.max(-1.0).min(1.0).mul_add(0.5, 0.5) * ((1u32 << 10u32) - 1u32) as f32) as u32;

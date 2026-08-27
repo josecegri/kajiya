@@ -367,7 +367,7 @@ impl LazyWorker for LoadGltfScene {
                             }
 
                             if flip_winding_order {
-                                for tri in indices.chunks_exact_mut(3) {
+                                for tri in indices.as_chunks_mut::<3>().0 {
                                     tri.swap(0, 2);
                                 }
                             }
