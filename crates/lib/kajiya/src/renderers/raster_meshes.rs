@@ -34,6 +34,8 @@ pub fn raster_meshes(
 ) {
     let mut pass = rg.add_pass("raster simple");
 
+    // TODO: there is a performance regression in the Rust shader compared to the HLSL counterpart, seems to be
+    //       in the fragment shader and perhaps related to the material loading code... but needs to be investigated
     let pipeline = pass.register_raster_pipeline(
         &[
             PipelineShaderDesc::builder(ShaderPipelineStage::Vertex)
@@ -43,8 +45,9 @@ pub fn raster_meshes(
                 .build()
                 .unwrap(),
             PipelineShaderDesc::builder(ShaderPipelineStage::Pixel)
-                // .rust_source("raster_simple::raster_simple_fs")
-                .hlsl_source("/shaders/raster_simple_ps.hlsl")
+                .rust_source("raster_simple::raster_simple_fs")
+                .entry("raster_simple::raster_simple_fs".to_owned())
+                // .hlsl_source("/shaders/raster_simple_ps.hlsl")
                 .build()
                 .unwrap(),
         ],

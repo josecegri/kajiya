@@ -1,5 +1,5 @@
 use crate::{render_overrides::RenderOverrides, view_constants::ViewConstants};
-use glam::{IVec4, Vec4};
+use glam::{IVec4, Vec3, Vec4, Vec4Swizzles};
 
 pub const IRCACHE_CASCADE_COUNT: usize = 12;
 
@@ -34,4 +34,16 @@ pub struct FrameConstants {
 
     pub ircache_grid_center: Vec4,
     pub ircache_cascades: [IrcacheCascadeConstants; IRCACHE_CASCADE_COUNT],
+}
+
+impl FrameConstants {
+    pub fn direction_view_to_world(&self, v: Vec3) -> Vec3 {
+        (self.view_constants.view_to_world * v.extend(0.0)).xyz()
+    }
+}
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct InstanceDynamicConstants {
+    pub emissive_multiplier: f32,
 }

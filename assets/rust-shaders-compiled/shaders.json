@@ -1,1 +1,1 @@
-{"entry_to_shader_module":[["raster_simple::raster_simple_vs","raster_simple-raster_simple_vs.spv"]]}
+{"entry_to_shader_module":[["raster_simple::raster_simple_fs","raster_simple-raster_simple_fs.spv"],["raster_simple::raster_simple_vs","raster_simple-raster_simple_vs.spv"]]}

@@ -17,11 +17,18 @@ pub struct InstanceTransform {
     pub previous: [Vec4; 3],
 }
 
-#[inline]
 pub fn transform_point(m: &[Vec4; 3], p: Vec3) -> Vec3 {
     Vec3::new(
         m[0].dot(p.extend(1.0)),
         m[1].dot(p.extend(1.0)),
         m[2].dot(p.extend(1.0)),
+    )
+}
+
+pub fn transform_vector(m: &[Vec4; 3], v: Vec3) -> Vec3 {
+    Vec3::new(
+        m[0].dot(v.extend(0.0)),
+        m[1].dot(v.extend(0.0)),
+        m[2].dot(v.extend(0.0)),
     )
 }
