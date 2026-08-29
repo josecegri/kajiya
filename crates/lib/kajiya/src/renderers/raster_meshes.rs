@@ -65,23 +65,13 @@ pub fn raster_meshes(
         ]
     };
 
-    let pipeline = if USE_RUST_SHADERS {
-        pass.register_raster_pipeline(
-            &shaders,
-            RasterPipelineDesc::builder()
-                .render_pass(render_pass.clone())
-                .face_cull(false)
-                .push_constants_bytes(2 * std::mem::size_of::<u32>()),
-        )
-    } else {
-        pass.register_raster_pipeline(
-            &shaders,
-            RasterPipelineDesc::builder()
-                .render_pass(render_pass.clone())
-                .face_cull(false)
-                .push_constants_bytes(2 * std::mem::size_of::<u32>()),
-        )
-    };
+    let pipeline = pass.register_raster_pipeline(
+        &shaders,
+        RasterPipelineDesc::builder()
+            .render_pass(render_pass.clone())
+            .face_cull(false)
+            .push_constants_bytes(2 * std::mem::size_of::<u32>()),
+    );
 
     let meshes: Vec<UploadedTriMesh> = mesh_data.meshes.to_vec();
     let instances: Vec<MeshInstance> = mesh_data.instances.to_vec();

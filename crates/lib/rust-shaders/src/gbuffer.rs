@@ -13,10 +13,11 @@ pub struct GBufferData {
 
 impl GBufferData {
     pub fn pack(self) -> UVec4 {
-        let mut res: UVec4 = Default::default();
-
-        res.x = util::pack_color_888(self.albedo);
-        res.y = util::pack_normal_11_10_11(self.normal) as u32;
+        let mut res = glam::UVec4 {
+            x: util::pack_color_888(self.albedo),
+            y: util::pack_normal_11_10_11(self.normal) as u32,
+            ..Default::default()
+        };
 
         let roughness_metalness = Vec2::new(
             util::roughness_to_perceptual_roughness(self.roughness),
