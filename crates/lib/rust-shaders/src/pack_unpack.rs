@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use macaw::Vec3;
+use glam::Vec3;
 
 fn unpack_unorm(pckd: u32, bit_count: u32) -> f32 {
     let max_val = (1u32 << bit_count) - 1;

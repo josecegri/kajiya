@@ -6,7 +6,7 @@ use rg::{Buffer, BufferDesc, RenderGraph, SimpleRenderPass};
 
 use crate::world_renderer::HistogramClipping;
 
-const USE_RUST_SHADERS: bool = false;
+const USE_RUST_SHADERS: bool = true;
 
 pub fn blur_pyramid(rg: &mut RenderGraph, input: &rg::Handle<Image>) -> rg::Handle<Image> {
     let skip_n_bottom_mips = 1;

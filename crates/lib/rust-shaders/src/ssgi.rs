@@ -1,7 +1,7 @@
 use glam::{
-    ivec2, uvec3, uvec4, vec2, vec4, IVec3, UVec3, Vec2, Vec3, Vec3Swizzles, Vec4, Vec4Swizzles,
+    FloatExt, IVec3, UVec3, Vec2, Vec3, Vec3Swizzles, Vec4, Vec4Swizzles, ivec2, uvec3, uvec4,
+    vec2, vec4,
 };
-use macaw::FloatExt;
 use rust_shaders_shared::{
     frame_constants::FrameConstants, gbuffer::*, ssgi::SsgiConstants, util::*,
     view_ray::ViewRayContext,
@@ -10,6 +10,8 @@ use spirv_std::{Image, Sampler};
 
 #[cfg(not(target_arch = "spirv"))]
 use spirv_std::macros::spirv;
+#[cfg(target_arch = "spirv")]
+use spirv_std::spirv;
 
 #[cfg(target_arch = "spirv")]
 use spirv_std::num_traits::Float;
@@ -376,7 +378,7 @@ fn process_ssgi_sample(
                         integrate_half_arc(h1p, n_angle) - integrate_half_arc(h2p, n_angle);
 
                     lighting *= inv_ao;
-                    lighting *= 0.0.step((-sample_vs_offset.normalize()).dot(sample_normal_vs));
+                    lighting *= 0.0_f32.step((-sample_vs_offset.normalize()).dot(sample_normal_vs));
                 }
 
                 *color_accum += lighting.extend(1.0);

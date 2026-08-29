@@ -12,6 +12,9 @@ use crate::world_renderer::MeshInstance;
 
 use super::GbufferDepth;
 
+// TODO: consider a global flag or cargo feature instead of a bunch of local flags
+const USE_RUST_SHADERS: bool = true;
+
 #[derive(Clone)]
 pub struct UploadedTriMesh {
     pub index_buffer_offset: u64,
@@ -36,26 +39,49 @@ pub fn raster_meshes(
 
     // TODO: there is a performance regression in the Rust shader compared to the HLSL counterpart, seems to be
     //       in the fragment shader and perhaps related to the material loading code... but needs to be investigated
-    let pipeline = pass.register_raster_pipeline(
-        &[
+    let shaders = if USE_RUST_SHADERS {
+        [
             PipelineShaderDesc::builder(ShaderPipelineStage::Vertex)
                 .rust_source("raster_simple::raster_simple_vs")
                 .entry("raster_simple::raster_simple_vs".to_owned())
-                // .hlsl_source("/shaders/raster_simple_vs.hlsl")
                 .build()
                 .unwrap(),
             PipelineShaderDesc::builder(ShaderPipelineStage::Pixel)
                 .rust_source("raster_simple::raster_simple_fs")
                 .entry("raster_simple::raster_simple_fs".to_owned())
-                // .hlsl_source("/shaders/raster_simple_ps.hlsl")
                 .build()
                 .unwrap(),
-        ],
-        RasterPipelineDesc::builder()
-            .render_pass(render_pass.clone())
-            .face_cull(false)
-            .push_constants_bytes(2 * std::mem::size_of::<u32>()),
-    );
+        ]
+    } else {
+        [
+            PipelineShaderDesc::builder(ShaderPipelineStage::Vertex)
+                .hlsl_source("/shaders/raster_simple_vs.hlsl")
+                .build()
+                .unwrap(),
+            PipelineShaderDesc::builder(ShaderPipelineStage::Pixel)
+                .hlsl_source("/shaders/raster_simple_ps.hlsl")
+                .build()
+                .unwrap(),
+        ]
+    };
+
+    let pipeline = if USE_RUST_SHADERS {
+        pass.register_raster_pipeline(
+            &shaders,
+            RasterPipelineDesc::builder()
+                .render_pass(render_pass.clone())
+                .face_cull(false)
+                .push_constants_bytes(2 * std::mem::size_of::<u32>()),
+        )
+    } else {
+        pass.register_raster_pipeline(
+            &shaders,
+            RasterPipelineDesc::builder()
+                .render_pass(render_pass.clone())
+                .face_cull(false)
+                .push_constants_bytes(2 * std::mem::size_of::<u32>()),
+        )
+    };
 
     let meshes: Vec<UploadedTriMesh> = mesh_data.meshes.to_vec();
     let instances: Vec<MeshInstance> = mesh_data.instances.to_vec();

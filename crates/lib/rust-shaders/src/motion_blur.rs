@@ -1,4 +1,4 @@
-use glam::{uvec2, vec2, IVec2, IVec3, UVec2, UVec3, Vec2, Vec3, Vec3Swizzles, Vec4, Vec4Swizzles};
+use glam::{IVec2, IVec3, UVec2, UVec3, Vec2, Vec3, Vec3Swizzles, Vec4, Vec4Swizzles, uvec2, vec2};
 use rust_shaders_shared::{
     frame_constants::FrameConstants,
     util::{depth_to_view_z, get_uv_u},
@@ -7,6 +7,8 @@ use spirv_std::{Image, Sampler};
 
 #[cfg(not(target_arch = "spirv"))]
 use spirv_std::macros::spirv;
+#[cfg(target_arch = "spirv")]
+use spirv_std::spirv;
 
 #[repr(C)]
 pub struct Constants {
@@ -49,7 +51,11 @@ pub fn motion_blur(
     #[spirv(descriptor_set = 0, binding = 1)] velocity_tex: &Image!(2D, type=f32, sampled=true),
     #[spirv(descriptor_set = 0, binding = 2)] tile_velocity_tex: &Image!(2D, type=f32, sampled=true),
     #[spirv(descriptor_set = 0, binding = 3)] depth_tex: &Image!(2D, type=f32, sampled=true),
-    #[spirv(descriptor_set = 0, binding = 4)] output_tex: &Image!(2D, type=f32, sampled=false),
+    #[spirv(descriptor_set = 0, binding = 4)] output_tex: &Image!(
+        2D,
+        format = rgba16f,
+        sampled = false
+    ),
     #[spirv(descriptor_set = 0, binding = 32)] sampler_lnc: &Sampler,
     #[spirv(descriptor_set = 0, binding = 33)] sampler_nnc: &Sampler,
     //#[spirv(descriptor_set = 0, binding = 33)] sampler_nnc: &Sampler,
@@ -184,14 +190,21 @@ pub fn motion_blur(
 
     let result = sum.xyz() + (1.0 - sum.w) * center_color;
     unsafe {
-        output_tex.write(px.truncate(), result);
+        // TODO: Rust side creates `output_tex` with `vk::Format::R16G16B16A16_SFLOAT` format in
+        //       `TaaRenderer::temporal_tex_desc()`, HLSL shader uses a `RWTexture2D<float3> output_tex` though and does
+        //       not set the last component of the texture texels
+        output_tex.write(px.truncate(), result.extend(1.0));
     }
 }
 
 #[spirv(compute(threads(8, 8)))]
 pub fn velocity_reduce_x(
     #[spirv(descriptor_set = 0, binding = 0)] input_tex: &Image!(2D, type=f32, sampled=true),
-    #[spirv(descriptor_set = 0, binding = 1)] output_tex: &Image!(2D, type=f32, sampled=false),
+    #[spirv(descriptor_set = 0, binding = 1)] output_tex: &Image!(
+        2D,
+        format = rg16f,
+        sampled = false
+    ),
     #[spirv(global_invocation_id)] px: UVec3,
 ) {
     let mut largest_velocity = Vec3::ZERO;
@@ -215,7 +228,11 @@ pub fn velocity_reduce_x(
 #[spirv(compute(threads(8, 8)))]
 pub fn velocity_reduce_y(
     #[spirv(descriptor_set = 0, binding = 0)] input_tex: &Image!(2D, type=f32, sampled=true),
-    #[spirv(descriptor_set = 0, binding = 1)] output_tex: &Image!(2D, type=f32, sampled=false),
+    #[spirv(descriptor_set = 0, binding = 1)] output_tex: &Image!(
+        2D,
+        format = rg16f,
+        sampled = false
+    ),
     #[spirv(global_invocation_id)] px: UVec3,
 ) {
     let mut largest_velocity = Vec3::ZERO;
@@ -239,7 +256,11 @@ pub fn velocity_reduce_y(
 #[spirv(compute(threads(8, 8)))]
 pub fn velocity_dilate(
     #[spirv(descriptor_set = 0, binding = 0)] input_tex: &Image!(2D, type=f32, sampled=true),
-    #[spirv(descriptor_set = 0, binding = 1)] output_tex: &Image!(2D, type=f32, sampled=false),
+    #[spirv(descriptor_set = 0, binding = 1)] output_tex: &Image!(
+        2D,
+        format = rg16f,
+        sampled = false
+    ),
     #[spirv(global_invocation_id)] px: IVec3,
 ) {
     let mut largest_velocity = Vec3::ZERO;

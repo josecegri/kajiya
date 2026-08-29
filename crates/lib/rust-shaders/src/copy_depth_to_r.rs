@@ -3,6 +3,8 @@ use spirv_std::Image;
 
 #[cfg(not(target_arch = "spirv"))]
 use spirv_std::macros::spirv;
+#[cfg(target_arch = "spirv")]
+use spirv_std::spirv;
 
 #[spirv(compute(threads(8, 8)))]
 pub fn copy_depth_to_r_cs(

@@ -81,6 +81,7 @@ impl Instance {
             .map(|raw_name| raw_name.as_ptr())
             .collect();
 
+        // TODO: upgrade to Vulkan 1.3 (ash does not fully support 1.4 afaik), additionally fix the validation layer error on absence of `uniformAndStorageBuffer8BitAccess`
         let app_desc = vk::ApplicationInfo::default().api_version(vk::make_api_version(0, 1, 2, 0));
 
         let instance_desc = vk::InstanceCreateInfo::default()

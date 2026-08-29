@@ -4,7 +4,7 @@ use kajiya_rg::{self as rg, SimpleRenderPass, TemporalRenderGraph};
 use rust_shaders_shared::ssgi::SsgiConstants;
 
 // The Rust shaders currently suffer a perfomance penalty. Tracking: https://github.com/EmbarkStudios/kajiya/issues/24
-const USE_RUST_SHADERS: bool = false;
+const USE_RUST_SHADERS: bool = true;
 
 pub struct SsgiRenderer {
     ssgi_tex: PingPongTemporalResource,

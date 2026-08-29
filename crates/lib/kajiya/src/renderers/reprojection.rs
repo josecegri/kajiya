@@ -3,7 +3,7 @@ use kajiya_rg::{self as rg, GetOrCreateTemporal, SimpleRenderPass};
 
 use super::GbufferDepth;
 
-const USE_RUST_SHADERS: bool = false;
+const USE_RUST_SHADERS: bool = true;
 
 pub fn calculate_reprojection_map(
     rg: &mut rg::TemporalRenderGraph,

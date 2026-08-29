@@ -4,6 +4,8 @@ use glam::{UVec3, Vec2, Vec4};
 
 #[cfg(not(target_arch = "spirv"))]
 use spirv_std::macros::spirv;
+#[cfg(target_arch = "spirv")]
+use spirv_std::spirv;
 
 #[repr(C)]
 pub struct Constants {

@@ -19,6 +19,7 @@ fn main() -> anyhow::Result<()> {
     .capability(Capability::Int8)
     .capability(Capability::RuntimeDescriptorArray)
     .capability(Capability::ShaderNonUniformEXT)
+    .capability(Capability::StorageImageExtendedFormats)
     .extension("SPV_EXT_descriptor_indexing")
     .multimodule(true)
     .spirv_metadata(SpirvMetadata::NameVariables)

@@ -1,12 +1,14 @@
 use glam::{IVec2, UVec2, UVec3, Vec4};
 use spirv_std::{
+    Image,
     arch::control_barrier,
     memory::{Scope, Semantics},
-    Image,
 };
 
 #[cfg(not(target_arch = "spirv"))]
 use spirv_std::macros::spirv;
+#[cfg(target_arch = "spirv")]
+use spirv_std::spirv;
 
 #[cfg(target_arch = "spirv")]
 use spirv_std::num_traits::Float;
@@ -67,13 +69,11 @@ pub fn blur_cs(
     }
 
     // GroupMemoryBarrierWithGroupSync();
-    unsafe {
-        control_barrier::<
-            { Scope::Workgroup as u32 },
-            { Scope::Workgroup as u32 },
-            { Semantics::WORKGROUP_MEMORY.bits() | Semantics::ACQUIRE_RELEASE.bits() },
-        >();
-    }
+    control_barrier::<
+        { Scope::Workgroup as u32 },
+        { Scope::Workgroup as u32 },
+        { Semantics::WORKGROUP_MEMORY.bits() | Semantics::ACQUIRE_RELEASE.bits() },
+    >();
 
     let mut res = Vec4::ZERO;
     let mut wt_sum = 0.0;

@@ -2,7 +2,7 @@ use kajiya_backend::{ash::vk, vulkan::image::*};
 use kajiya_rg::{self as rg};
 use rg::{RenderGraph, SimpleRenderPass};
 
-const USE_RUST_SHADERS: bool = false;
+const USE_RUST_SHADERS: bool = true;
 
 pub fn motion_blur(
     rg: &mut RenderGraph,
@@ -74,7 +74,7 @@ pub fn motion_blur(
         .dispatch(velocity_dilated.desc().extent);
     } else {
         SimpleRenderPass::new_compute(
-            rg.add_pass("velocity reduce y"),
+            rg.add_pass("velocity dilate"),
             "/shaders/motion_blur/velocity_dilate.hlsl",
         )
         .read(&velocity_reduced_y)
