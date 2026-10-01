@@ -231,36 +231,18 @@ impl Device {
         };
 
         let mut device_extension_names = vec![
-            vk::EXT_DESCRIPTOR_INDEXING_NAME.as_ptr(),
-            vk::EXT_SCALAR_BLOCK_LAYOUT_NAME.as_ptr(),
-            vk::KHR_MAINTENANCE1_NAME.as_ptr(),
-            vk::KHR_MAINTENANCE2_NAME.as_ptr(),
-            vk::KHR_MAINTENANCE3_NAME.as_ptr(),
-            vk::KHR_GET_MEMORY_REQUIREMENTS2_NAME.as_ptr(),
-            vk::EXT_DESCRIPTOR_INDEXING_NAME.as_ptr(),
-            vk::KHR_IMAGELESS_FRAMEBUFFER_NAME.as_ptr(),
-            vk::KHR_IMAGE_FORMAT_LIST_NAME.as_ptr(),
-            vk::KHR_DESCRIPTOR_UPDATE_TEMPLATE_NAME.as_ptr(),
-            // Rust-GPU
-            vk::KHR_SHADER_FLOAT16_INT8_NAME.as_ptr(),
             // DLSS
             #[cfg(feature = "dlss")]
             {
                 c"VK_NVX_binary_import".as_ptr()
             },
             #[cfg(feature = "dlss")]
-            {
-                c"VK_KHR_push_descriptor".as_ptr()
-            },
-            #[cfg(feature = "dlss")]
             vk::NVX_IMAGE_VIEW_HANDLE_NAME.as_ptr(),
         ];
 
         let ray_tracing_extensions = [
-            vk::KHR_VULKAN_MEMORY_MODEL_NAME.as_ptr(), // used in ray tracing shaders
-            vk::KHR_PIPELINE_LIBRARY_NAME.as_ptr(),    // rt dep
+            vk::KHR_PIPELINE_LIBRARY_NAME.as_ptr(),         // rt dep
             vk::KHR_DEFERRED_HOST_OPERATIONS_NAME.as_ptr(), // rt dep
-            vk::KHR_BUFFER_DEVICE_ADDRESS_NAME.as_ptr(), // rt dep
             vk::KHR_ACCELERATION_STRUCTURE_NAME.as_ptr(),
             vk::KHR_RAY_TRACING_PIPELINE_NAME.as_ptr(),
             vk::KHR_RAY_QUERY_NAME.as_ptr(),
@@ -323,17 +305,9 @@ impl Device {
 
             // query features
             {
-                let mut scalar_block = vk::PhysicalDeviceScalarBlockLayoutFeaturesEXT::default();
-                let mut descriptor_indexing =
-                    vk::PhysicalDeviceDescriptorIndexingFeaturesEXT::default();
-                let mut imageless_framebuffer =
-                    vk::PhysicalDeviceImagelessFramebufferFeaturesKHR::default();
-                let mut shader_float16_int8 =
-                    vk::PhysicalDeviceShaderFloat16Int8Features::default();
-                let mut vulkan_memory_model =
-                    vk::PhysicalDeviceVulkanMemoryModelFeaturesKHR::default();
-                let mut get_buffer_device_address_features =
-                    ash::vk::PhysicalDeviceBufferDeviceAddressFeatures::default();
+                let mut vulkan12 = vk::PhysicalDeviceVulkan12Features::default();
+                let mut vulkan13 = vk::PhysicalDeviceVulkan13Features::default();
+                let mut vulkan14 = vk_tmp::PhysicalDeviceVulkan14Features::default();
                 let mut acceleration_structure_features =
                     ash::vk::PhysicalDeviceAccelerationStructureFeaturesKHR::default();
                 let mut ray_tracing_pipeline_features =
@@ -341,12 +315,9 @@ impl Device {
                 let mut ray_query_features = ash::vk::PhysicalDeviceRayQueryFeaturesKHR::default();
 
                 let mut features2 = vk::PhysicalDeviceFeatures2::default()
-                    .push_next(&mut scalar_block)
-                    .push_next(&mut descriptor_indexing)
-                    .push_next(&mut imageless_framebuffer)
-                    .push_next(&mut shader_float16_int8)
-                    .push_next(&mut vulkan_memory_model)
-                    .push_next(&mut get_buffer_device_address_features);
+                    .push_next(&mut vulkan12)
+                    .push_next(&mut vulkan13)
+                    .push_next(&mut vulkan14);
 
                 if ray_tracing_enabled {
                     features2 = features2
@@ -355,42 +326,39 @@ impl Device {
                         .push_next(&mut ray_query_features);
                 }
 
-                (instance.fp_v1_1().get_physical_device_features2)(pdevice.raw, &mut features2);
+                instance.get_physical_device_features2(pdevice.raw, &mut features2);
 
-                debug!("{:#?}", scalar_block);
-                debug!("{:#?}", descriptor_indexing);
-                debug!("{:#?}", imageless_framebuffer);
-                debug!("{:#?}", shader_float16_int8);
-                debug!("{:#?}", vulkan_memory_model);
-                debug!("{:#?}", get_buffer_device_address_features);
+                debug!("{:#?}", vulkan12);
+                debug!("{:#?}", vulkan13);
+                debug!("{:#?}", vulkan14);
 
                 // The suggested `#[rustfmt::skip]` is not stable
                 #[allow(clippy::deprecated_cfg_attr)]
                 #[cfg_attr(rustfmt, rustfmt_skip)]
                 {
-                    assert!(scalar_block.scalar_block_layout != 0);
+                    assert!(vulkan12.scalar_block_layout != 0);
 
-                    assert!(descriptor_indexing.shader_uniform_texel_buffer_array_dynamic_indexing != 0);
-                    assert!(descriptor_indexing.shader_storage_texel_buffer_array_dynamic_indexing != 0);
-                    assert!(descriptor_indexing.shader_sampled_image_array_non_uniform_indexing != 0);
-                    assert!(descriptor_indexing.shader_storage_image_array_non_uniform_indexing != 0);
-                    assert!(descriptor_indexing.shader_uniform_texel_buffer_array_non_uniform_indexing != 0);
-                    assert!(descriptor_indexing.shader_storage_texel_buffer_array_non_uniform_indexing != 0);
-                    assert!(descriptor_indexing.descriptor_binding_sampled_image_update_after_bind != 0);
-                    assert!(descriptor_indexing.descriptor_binding_update_unused_while_pending != 0);
-                    assert!(descriptor_indexing.descriptor_binding_partially_bound != 0);
-                    assert!(descriptor_indexing.descriptor_binding_variable_descriptor_count != 0);
-                    assert!(descriptor_indexing.runtime_descriptor_array != 0);
+                    assert!(vulkan12.shader_uniform_texel_buffer_array_dynamic_indexing != 0);
+                    assert!(vulkan12.shader_storage_texel_buffer_array_dynamic_indexing != 0);
+                    assert!(vulkan12.shader_sampled_image_array_non_uniform_indexing != 0);
+                    assert!(vulkan12.shader_storage_image_array_non_uniform_indexing != 0);
+                    assert!(vulkan12.shader_uniform_texel_buffer_array_non_uniform_indexing != 0);
+                    assert!(vulkan12.shader_storage_texel_buffer_array_non_uniform_indexing != 0);
+                    assert!(vulkan12.descriptor_binding_sampled_image_update_after_bind != 0);
+                    assert!(vulkan12.descriptor_binding_update_unused_while_pending != 0);
+                    assert!(vulkan12.descriptor_binding_partially_bound != 0);
+                    assert!(vulkan12.descriptor_binding_variable_descriptor_count != 0);
+                    assert!(vulkan12.runtime_descriptor_array != 0);
 
-                    assert!(imageless_framebuffer.imageless_framebuffer != 0);
+                    assert!(vulkan12.imageless_framebuffer != 0);
 
-                    assert!(shader_float16_int8.shader_int8 != 0);
+                    assert!(vulkan12.shader_int8 != 0);
 
                     if ray_tracing_enabled {
-                        assert!(descriptor_indexing.shader_uniform_buffer_array_non_uniform_indexing != 0);
-                        assert!(descriptor_indexing.shader_storage_buffer_array_non_uniform_indexing != 0);
+                        assert!(vulkan12.shader_uniform_buffer_array_non_uniform_indexing != 0);
+                        assert!(vulkan12.shader_storage_buffer_array_non_uniform_indexing != 0);
 
-                        assert!(vulkan_memory_model.vulkan_memory_model != 0);
+                        assert!(vulkan12.vulkan_memory_model != 0);
 
                         assert!(acceleration_structure_features.acceleration_structure != 0);
                         assert!(acceleration_structure_features.descriptor_binding_acceleration_structure_update_after_bind != 0);
@@ -398,21 +366,15 @@ impl Device {
                         assert!(ray_tracing_pipeline_features.ray_tracing_pipeline != 0);
                         assert!(ray_tracing_pipeline_features.ray_tracing_pipeline_trace_rays_indirect != 0);
 
-                        assert!(get_buffer_device_address_features.buffer_device_address != 0);
+                        assert!(vulkan12.buffer_device_address != 0);
                     }
                 }
             }
 
             // enable features
-            let mut scalar_block = vk::PhysicalDeviceScalarBlockLayoutFeaturesEXT::default();
-            let mut descriptor_indexing =
-                vk::PhysicalDeviceDescriptorIndexingFeaturesEXT::default();
-            let mut imageless_framebuffer =
-                vk::PhysicalDeviceImagelessFramebufferFeaturesKHR::default();
-            let mut shader_float16_int8 = vk::PhysicalDeviceShaderFloat16Int8Features::default();
-            let mut vulkan_memory_model = vk::PhysicalDeviceVulkanMemoryModelFeaturesKHR::default();
-            let mut get_buffer_device_address_features =
-                ash::vk::PhysicalDeviceBufferDeviceAddressFeatures::default();
+            let mut vulkan12 = vk::PhysicalDeviceVulkan12Features::default();
+            let mut vulkan13 = vk::PhysicalDeviceVulkan13Features::default();
+            let mut vulkan14 = vk_tmp::PhysicalDeviceVulkan14Features::default();
             let mut acceleration_structure_features =
                 ash::vk::PhysicalDeviceAccelerationStructureFeaturesKHR::default();
             let mut ray_tracing_pipeline_features =
@@ -420,12 +382,9 @@ impl Device {
             let mut ray_query_features = ash::vk::PhysicalDeviceRayQueryFeaturesKHR::default();
 
             let mut features2 = vk::PhysicalDeviceFeatures2::default()
-                .push_next(&mut scalar_block)
-                .push_next(&mut descriptor_indexing)
-                .push_next(&mut imageless_framebuffer)
-                .push_next(&mut shader_float16_int8)
-                .push_next(&mut vulkan_memory_model)
-                .push_next(&mut get_buffer_device_address_features);
+                .push_next(&mut vulkan12)
+                .push_next(&mut vulkan13)
+                .push_next(&mut vulkan14);
 
             if ray_tracing_enabled {
                 features2 = features2
@@ -434,7 +393,7 @@ impl Device {
                     .push_next(&mut ray_query_features);
             }
 
-            (instance.fp_v1_1().get_physical_device_features2)(pdevice.raw, &mut features2);
+            instance.get_physical_device_features2(pdevice.raw, &mut features2);
 
             let device_create_info = vk::DeviceCreateInfo::default()
                 .queue_create_infos(&universal_queue_info)
@@ -753,4 +712,75 @@ pub struct SamplerDesc {
     pub texel_filter: vk::Filter,
     pub mipmap_mode: vk::SamplerMipmapMode,
     pub address_modes: vk::SamplerAddressMode,
+}
+
+// TODO: can be removed if ash ever supports Vulkan 1.4
+mod vk_tmp {
+    use ash::vk::*;
+
+    #[repr(C)]
+    #[derive(Debug, Copy, Clone)]
+    #[doc = "<https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/VkPhysicalDeviceVulkan14Features.html>"]
+    #[must_use]
+    pub struct PhysicalDeviceVulkan14Features<'a> {
+        pub s_type: i32,
+        pub p_next: *mut std::ffi::c_void,
+        pub global_priority_query: Bool32,
+        pub shader_subgroup_rotate: Bool32,
+        pub shader_subgroup_rotate_clustered: Bool32,
+        pub shader_float_controls2: Bool32,
+        pub shader_expect_assume: Bool32,
+        pub rectangular_lines: Bool32,
+        pub bresenham_lines: Bool32,
+        pub smooth_lines: Bool32,
+        pub stippled_rectangular_lines: Bool32,
+        pub stippled_bresenham_lines: Bool32,
+        pub stippled_smooth_lines: Bool32,
+        pub vertex_attribute_instance_rate_divisor: Bool32,
+        pub vertex_attribute_instance_rate_zero_divisor: Bool32,
+        pub index_type_uint8: Bool32,
+        pub dynamic_rendering_local_read: Bool32,
+        pub maintenance5: Bool32,
+        pub maintenance6: Bool32,
+        pub pipeline_protected_access: Bool32,
+        pub pipeline_robustness: Bool32,
+        pub host_image_copy: Bool32,
+        pub push_descriptor: Bool32,
+        pub _marker: std::marker::PhantomData<&'a ()>,
+    }
+    unsafe impl Send for PhysicalDeviceVulkan14Features<'_> {}
+    unsafe impl Sync for PhysicalDeviceVulkan14Features<'_> {}
+    impl ::core::default::Default for PhysicalDeviceVulkan14Features<'_> {
+        #[inline]
+        fn default() -> Self {
+            Self {
+                s_type: 55, // VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_4_FEATURES = 55
+                p_next: ::core::ptr::null_mut(),
+                global_priority_query: Bool32::default(),
+                shader_subgroup_rotate: Bool32::default(),
+                shader_subgroup_rotate_clustered: Bool32::default(),
+                shader_float_controls2: Bool32::default(),
+                shader_expect_assume: Bool32::default(),
+                rectangular_lines: Bool32::default(),
+                bresenham_lines: Bool32::default(),
+                smooth_lines: Bool32::default(),
+                stippled_rectangular_lines: Bool32::default(),
+                stippled_bresenham_lines: Bool32::default(),
+                stippled_smooth_lines: Bool32::default(),
+                vertex_attribute_instance_rate_divisor: Bool32::default(),
+                vertex_attribute_instance_rate_zero_divisor: Bool32::default(),
+                index_type_uint8: Bool32::default(),
+                dynamic_rendering_local_read: Bool32::default(),
+                maintenance5: Bool32::default(),
+                maintenance6: Bool32::default(),
+                pipeline_protected_access: Bool32::default(),
+                pipeline_robustness: Bool32::default(),
+                host_image_copy: Bool32::default(),
+                push_descriptor: Bool32::default(),
+                _marker: std::marker::PhantomData,
+            }
+        }
+    }
+    unsafe impl ExtendsPhysicalDeviceFeatures2 for PhysicalDeviceVulkan14Features<'_> {}
+    unsafe impl ExtendsDeviceCreateInfo for PhysicalDeviceVulkan14Features<'_> {}
 }

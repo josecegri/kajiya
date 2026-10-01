@@ -668,7 +668,7 @@ impl FramebufferCache {
                     .iter()
                     .zip(key.attachments.iter())
                     .map(|(desc, (usage, flags))| {
-                        vk::FramebufferAttachmentImageInfoKHR::default()
+                        vk::FramebufferAttachmentImageInfo::default()
                             .width(width as _)
                             .height(height as _)
                             .flags(*flags)
@@ -678,11 +678,11 @@ impl FramebufferCache {
                     })
                     .collect::<ArrayVec<_, { MAX_COLOR_ATTACHMENTS + 1 }>>();
 
-                let mut imageless_desc = vk::FramebufferAttachmentsCreateInfoKHR::default()
+                let mut imageless_desc = vk::FramebufferAttachmentsCreateInfo::default()
                     .attachment_image_infos(&attachments);
 
                 let mut fbo_desc = vk::FramebufferCreateInfo::default()
-                    .flags(vk::FramebufferCreateFlags::IMAGELESS_KHR)
+                    .flags(vk::FramebufferCreateFlags::IMAGELESS)
                     .render_pass(self.render_pass)
                     .width(width as _)
                     .height(height as _)

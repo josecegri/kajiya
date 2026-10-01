@@ -337,7 +337,7 @@ impl<'a, 'exec_params, 'constants> RenderPassApi<'a, 'exec_params, 'constants> {
         let image_attachments = image_attachments?;
 
         let mut pass_attachment_desc =
-            vk::RenderPassAttachmentBeginInfoKHR::default().attachments(&image_attachments);
+            vk::RenderPassAttachmentBeginInfo::default().attachments(&image_attachments);
 
         let [width, height] = dims;
 

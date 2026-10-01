@@ -287,6 +287,7 @@ impl Swapchain {
 impl Drop for Swapchain {
     fn drop(&mut self) {
         unsafe {
+            self.device.raw.device_wait_idle().unwrap();
             self.fns.destroy_swapchain(self.raw, None);
         }
     }

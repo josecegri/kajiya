@@ -3,8 +3,8 @@ use ash::{ext, vk};
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 use std::{
-    ffi::{CStr, CString, c_void},
-    os::raw::c_char,
+    borrow::Cow,
+    ffi::{self, CStr, CString},
     sync::Arc,
 };
 
@@ -34,10 +34,8 @@ pub struct Instance {
     pub(crate) entry: ash::Entry,
     pub raw: ash::Instance,
     #[allow(dead_code)]
-    pub(crate) debug_callback: Option<vk::DebugReportCallbackEXT>,
+    pub(crate) debug_callback: Option<vk::DebugUtilsMessengerEXT>,
     #[allow(dead_code)]
-    #[allow(deprecated)]
-    pub(crate) debug_loader: Option<ext::debug_report::Instance>,
     pub(crate) debug_utils: Option<ext::debug_utils::Instance>,
 }
 
@@ -47,11 +45,9 @@ impl Instance {
     }
 
     fn extension_names(builder: &DeviceBuilder) -> Vec<*const i8> {
-        let mut names = vec![vk::KHR_GET_PHYSICAL_DEVICE_PROPERTIES2_NAME.as_ptr()];
+        let mut names = vec![];
 
         if builder.graphics_debugging {
-            #[allow(deprecated)]
-            names.push(ext::debug_report::NAME.as_ptr());
             names.push(ext::debug_utils::NAME.as_ptr());
         }
 
@@ -81,8 +77,7 @@ impl Instance {
             .map(|raw_name| raw_name.as_ptr())
             .collect();
 
-        // TODO: upgrade to Vulkan 1.3 (ash does not fully support 1.4 afaik), additionally fix the validation layer error on absence of `uniformAndStorageBuffer8BitAccess`
-        let app_desc = vk::ApplicationInfo::default().api_version(vk::make_api_version(0, 1, 2, 0));
+        let app_desc = vk::ApplicationInfo::default().api_version(vk::make_api_version(0, 1, 4, 0));
 
         let instance_desc = vk::InstanceCreateInfo::default()
             .application_info(&app_desc)
@@ -92,68 +87,69 @@ impl Instance {
         let instance = unsafe { entry.create_instance(&instance_desc, None)? };
         info!("Created a Vulkan instance");
 
-        let (debug_loader, debug_callback, debug_utils) = if builder.graphics_debugging {
-            let debug_info = ash::vk::DebugReportCallbackCreateInfoEXT {
-                flags: ash::vk::DebugReportFlagsEXT::ERROR
-                    | ash::vk::DebugReportFlagsEXT::WARNING
-                    | ash::vk::DebugReportFlagsEXT::PERFORMANCE_WARNING,
-                pfn_callback: Some(vulkan_debug_callback),
-                ..Default::default()
-            };
+        let (debug_utils, debug_callback) = if builder.graphics_debugging {
+            let debug_utils = ash::ext::debug_utils::Instance::new(&entry, &instance);
 
-            #[allow(deprecated)]
-            let debug_loader = ext::debug_report::Instance::new(&entry, &instance);
+            let debug_info = ash::vk::DebugUtilsMessengerCreateInfoEXT::default()
+                .message_severity(
+                    vk::DebugUtilsMessageSeverityFlagsEXT::ERROR
+                        | vk::DebugUtilsMessageSeverityFlagsEXT::WARNING
+                        | vk::DebugUtilsMessageSeverityFlagsEXT::INFO,
+                )
+                .message_type(
+                    vk::DebugUtilsMessageTypeFlagsEXT::GENERAL
+                        | vk::DebugUtilsMessageTypeFlagsEXT::VALIDATION
+                        | vk::DebugUtilsMessageTypeFlagsEXT::PERFORMANCE,
+                )
+                .pfn_user_callback(Some(vulkan_debug_callback));
 
             let debug_callback = unsafe {
-                #[allow(deprecated)]
-                debug_loader
-                    .create_debug_report_callback(&debug_info, None)
+                debug_utils
+                    .create_debug_utils_messenger(&debug_info, None)
                     .unwrap()
             };
 
-            let debug_utils = ash::ext::debug_utils::Instance::new(&entry, &instance);
-
-            (Some(debug_loader), Some(debug_callback), Some(debug_utils))
+            (Some(debug_utils), Some(debug_callback))
         } else {
-            (None, None, None)
+            (None, None)
         };
 
         Ok(Self {
             entry,
             raw: instance,
             debug_callback,
-            debug_loader,
             debug_utils,
         })
     }
 }
 
 unsafe extern "system" fn vulkan_debug_callback(
-    _flags: vk::DebugReportFlagsEXT,
-    _obj_type: vk::DebugReportObjectTypeEXT,
-    _src_obj: u64,
-    _location: usize,
-    _msg_code: i32,
-    _layer_prefix: *const c_char,
-    message: *const c_char,
-    _user_data: *mut c_void,
-) -> u32 {
-    let message = unsafe { CStr::from_ptr(message).to_str().unwrap() };
+    message_severity: vk::DebugUtilsMessageSeverityFlagsEXT,
+    message_type: vk::DebugUtilsMessageTypeFlagsEXT,
+    p_callback_data: *const vk::DebugUtilsMessengerCallbackDataEXT<'_>,
+    _user_data: *mut std::os::raw::c_void,
+) -> vk::Bool32 {
+    let callback_data = unsafe { *p_callback_data };
 
-    #[allow(clippy::if_same_then_else)]
-    if message.starts_with("Validation Error: [ VUID-VkWriteDescriptorSet-descriptorType-00322")
-        || message.starts_with("Validation Error: [ VUID-VkWriteDescriptorSet-descriptorType-02752")
-    {
-        // Validation layers incorrectly report an error in pushing immutable sampler descriptors.
-        //
-        // https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/vkCmdPushDescriptorSetKHR.html
-        // This documentation claims that it's necessary to push immutable samplers.
-    } else if message.starts_with("Validation Performance Warning") {
-    } else if message.starts_with("Validation Warning: [ VUID_Undefined ]") {
-        log::warn!("{}\n", message);
+    let message_id_number = callback_data.message_id_number;
+
+    let message_id_name = if callback_data.p_message_id_name.is_null() {
+        Cow::Borrowed("")
     } else {
-        log::error!("{}\n", message);
+        unsafe { ffi::CStr::from_ptr(callback_data.p_message_id_name).to_string_lossy() }
+    };
+
+    let message = if callback_data.p_message.is_null() {
+        Cow::Borrowed("")
+    } else {
+        unsafe { ffi::CStr::from_ptr(callback_data.p_message).to_string_lossy() }
+    };
+
+    if !message_id_name.contains("Loader Message") {
+        println!(
+            "[{message_severity:?} ({message_type:?})] [{message_id_name} ({message_id_number})] : {message}\n",
+        );
     }
 
-    ash::vk::FALSE
+    vk::FALSE
 }
