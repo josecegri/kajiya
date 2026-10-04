@@ -74,7 +74,7 @@ impl Swapchain {
 
         //dbg!(&surface_capabilities);
         let surface_resolution = match surface_capabilities.current_extent.width {
-            std::u32::MAX => desc.dims,
+            u32::MAX => desc.dims,
             _ => surface_capabilities.current_extent,
         };
 
