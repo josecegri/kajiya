@@ -539,7 +539,13 @@ pub fn get_image_create_info(desc: &ImageDesc, initial_data: bool) -> vk::ImageC
         usage: image_usage,
         sharing_mode: vk::SharingMode::EXCLUSIVE,
         initial_layout: match initial_data {
-            true => vk::ImageLayout::PREINITIALIZED,
+            true => {
+                if desc.tiling == vk::ImageTiling::LINEAR {
+                    vk::ImageLayout::PREINITIALIZED
+                } else {
+                    vk::ImageLayout::UNDEFINED
+                }
+            }
             false => vk::ImageLayout::UNDEFINED,
         },
         ..Default::default()
